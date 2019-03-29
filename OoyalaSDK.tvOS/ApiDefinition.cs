@@ -41,6 +41,7 @@ namespace OoyalaSDK.tvOS
 
     // @interface OOOoyalaPlayerStateConverter : NSObject
     [BaseType(typeof(NSObject))]
+    [Protocol]
     interface OOOoyalaPlayerStateConverter
     {
         // +(NSString *)playerStateToString:(OOOoyalaPlayerState)state;
@@ -237,7 +238,9 @@ namespace OoyalaSDK.tvOS
 
     // @interface OOOoyalaPlayer : NSObject
     [BaseType(typeof(NSObject))]
-    interface OOOoyalaPlayer
+    //interface OOOoyalaPlayer
+    //Hack
+    interface OOOoyalaPlayer : OOOoyalaPlayer_Playback
     {
         // +(void)setEnvironment:(OOOoyalaPlayerEnvironment)e;
         [Static]
@@ -508,8 +511,8 @@ namespace OoyalaSDK.tvOS
         void ReauthorizeCurrentItemWithCallback(OOAuthorizeCallback callback);
 
         // -(OOOoyalaPlayerState)state;
-        [Export("state")]
-        OOOoyalaPlayerState State();
+        //[Export("state")]
+        //OOOoyalaPlayerState State();
 
         // -(void)setCustomAnalyticsTags:(NSArray *)tags;
         [Export("setCustomAnalyticsTags:")]
@@ -645,6 +648,7 @@ namespace OoyalaSDK.tvOS
     // @interface AdPluginManagement (OOOoyalaPlayer) <OOAdPluginManagerProtocol>
     //[Category]
     [BaseType(typeof(OOOoyalaPlayer))]
+    [Protocol]
     interface OOOoyalaPlayer_AdPluginManagement : OOAdPluginManagerProtocol
     {
         // -(void)registerAdPlayer:(Class)adPlayerClass forType:(Class)adClass;
@@ -658,7 +662,7 @@ namespace OoyalaSDK.tvOS
     }
 
     // @interface Ads (OOOoyalaPlayer)
-    //[Category]
+    [Protocol]
     [BaseType(typeof(OOOoyalaPlayer))]
     interface OOOoyalaPlayer_Ads
     {
@@ -710,7 +714,7 @@ namespace OoyalaSDK.tvOS
     }
 
     // @interface Playback (OOOoyalaPlayer)
-    //[Category]
+    [Protocol]
     [BaseType(typeof(OOOoyalaPlayer))]
     interface OOOoyalaPlayer_Playback
     {
@@ -804,7 +808,7 @@ namespace OoyalaSDK.tvOS
     }
 
     // @interface AppEvents (OOOoyalaPlayer)
-    //[Category]
+    [Protocol]
     [BaseType(typeof(OOOoyalaPlayer))]
     interface OOOoyalaPlayer_AppEvents
     {
@@ -835,14 +839,14 @@ namespace OoyalaSDK.tvOS
     }
 
     // @interface PlaybackSpeed (OOOoyalaPlayer) <OOPlaybackSpeedProtocol>
-    //[Category]
+    [Protocol]
     [BaseType(typeof(OOOoyalaPlayer))]
     interface OOOoyalaPlayer_PlaybackSpeed : OOPlaybackSpeedProtocol
     {
     }
 
     // @interface Cast (OOOoyalaPlayer)
-    //[Category]
+    [Protocol]
     [BaseType(typeof(OOOoyalaPlayer))]
     interface OOOoyalaPlayer_Cast
     {
@@ -866,7 +870,7 @@ namespace OoyalaSDK.tvOS
     }
 
     // @interface PlaybackWorkflow (OOOoyalaPlayer)
-    //[Category]
+    [Protocol]
     [BaseType(typeof(OOOoyalaPlayer))]
     interface OOOoyalaPlayer_PlaybackWorkflow
     {
@@ -893,7 +897,7 @@ namespace OoyalaSDK.tvOS
     }
 
     // @interface Channel (OOOoyalaPlayer)
-    //[Category]
+    [Protocol]
     [BaseType(typeof(OOOoyalaPlayer))]
     interface OOOoyalaPlayer_Channel
     {
@@ -914,7 +918,7 @@ namespace OoyalaSDK.tvOS
     }
 
     // @interface ClosedCaptions (OOOoyalaPlayer)
-    //[Category]
+    [Protocol]
     [BaseType(typeof(OOOoyalaPlayer))]
     interface OOOoyalaPlayer_ClosedCaptions
     {
@@ -933,7 +937,7 @@ namespace OoyalaSDK.tvOS
     }
 
     // @interface MoviePlayerCreation (OOOoyalaPlayer)
-    //[Category]
+    [Protocol]
     [BaseType(typeof(OOOoyalaPlayer))]
     interface OOOoyalaPlayer_MoviePlayerCreation
     {
@@ -944,7 +948,7 @@ namespace OoyalaSDK.tvOS
     }
 
     // @interface UI (OOOoyalaPlayer)
-    //[Category]
+    [Protocol]
     [BaseType(typeof(OOOoyalaPlayer))]
     interface OOOoyalaPlayer_UI
     {
@@ -1007,7 +1011,7 @@ namespace OoyalaSDK.tvOS
     }
 
     // @interface MultiAudio (OOOoyalaPlayer) <OOMultiAudioProtocol>
-    //[Category]
+    [Protocol]
     [BaseType(typeof(OOOoyalaPlayer))]
     interface OOOoyalaPlayer_MultiAudio : OOMultiAudioProtocol
     {
@@ -1352,6 +1356,7 @@ namespace OoyalaSDK.tvOS
 
     // @interface OODefaultAudioOnlyPlayerInfo : OODefaultPlayerInfo
     [BaseType(typeof(OODefaultPlayerInfo))]
+    [Protocol]
     interface OODefaultAudioOnlyPlayerInfo
     {
     }
@@ -4989,6 +4994,7 @@ namespace OoyalaSDK.tvOS
 
     // @interface OOControlsViewController : UIViewController
     [BaseType(typeof(UIViewController))]
+    [Protocol]
     interface OOControlsViewController
     {
         [Wrap("WeakDelegate")]
@@ -5117,4 +5123,58 @@ namespace OoyalaSDK.tvOS
         // NSString OO_DELIVERY_TYPE_AKAMAI_HD2_HLS { get; }
     }
 
+    // @interface OOOoyalaTVPlayerViewController : UIViewController
+    [BaseType(typeof(UIViewController))]
+    interface OOOoyalaTVPlayerViewController
+    {
+        // @property (nonatomic) OOOoyalaPlayer * player;
+        [Export("player", ArgumentSemantic.Assign)]
+        OOOoyalaPlayer Player { get; set; }
+
+        // @property (nonatomic) BOOL playbackControlsEnabled;
+        [Export("playbackControlsEnabled")]
+        bool PlaybackControlsEnabled { get; set; }
+
+        // @property (nonatomic) UIColor * progressTintColor;
+        [Export("progressTintColor", ArgumentSemantic.Assign)]
+        UIColor ProgressTintColor { get; set; }
+
+        // -(instancetype)initWithPlayer:(OOOoyalaPlayer *)player;
+        [Export("initWithPlayer:")]
+        IntPtr Constructor(OOOoyalaPlayer player);
+
+        // -(void)showProgressBar;
+        [Export("showProgressBar")]
+        void ShowProgressBar();
+
+        // -(void)hideProgressBar;
+        [Export("hideProgressBar")]
+        void HideProgressBar();
+
+        // -(NSArray *)availableOptions;
+        [Export("availableOptions")]
+        //[Verify(MethodToProperty), Verify(StronglyTypedNSArray)]
+        NSObject[] AvailableOptions { get; }
+
+        // -(BOOL)closedCaptionMenuDisplayed;
+        [Export("closedCaptionMenuDisplayed")]
+        //[Verify(MethodToProperty)]
+        bool ClosedCaptionMenuDisplayed { get; }
+
+        // -(void)setupClosedCaptionsMenu;
+        [Export("setupClosedCaptionsMenu")]
+        void SetupClosedCaptionsMenu();
+
+        // -(void)addClosedCaptionsView;
+        [Export("addClosedCaptionsView")]
+        void AddClosedCaptionsView();
+
+        // -(void)removeClosedCaptionsMenu;
+        [Export("removeClosedCaptionsMenu")]
+        void RemoveClosedCaptionsMenu();
+
+        // -(void)updatePlayheadWithSeekTime:(double)seekTime;
+        [Export("updatePlayheadWithSeekTime:")]
+        void UpdatePlayheadWithSeekTime(double seekTime);
+    }
 }
