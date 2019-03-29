@@ -238,9 +238,8 @@ namespace OoyalaSDK.tvOS
 
     // @interface OOOoyalaPlayer : NSObject
     [BaseType(typeof(NSObject))]
-    //interface OOOoyalaPlayer
     //Hack
-    interface OOOoyalaPlayer : OOOoyalaPlayer_Playback
+    interface OOOoyalaPlayer : OOOoyalaPlayer_Playback, OOOoyalaPlayer_MultiAudio, OOOoyalaPlayer_AdPluginManagement
     {
         // +(void)setEnvironment:(OOOoyalaPlayerEnvironment)e;
         [Static]
@@ -647,7 +646,7 @@ namespace OoyalaSDK.tvOS
 
     // @interface AdPluginManagement (OOOoyalaPlayer) <OOAdPluginManagerProtocol>
     //[Category]
-    [BaseType(typeof(OOOoyalaPlayer))]
+    [BaseType(typeof(NSObject))]
     [Protocol]
     interface OOOoyalaPlayer_AdPluginManagement : OOAdPluginManagerProtocol
     {
@@ -715,7 +714,7 @@ namespace OoyalaSDK.tvOS
 
     // @interface Playback (OOOoyalaPlayer)
     [Protocol]
-    [BaseType(typeof(OOOoyalaPlayer))]
+    [BaseType(typeof(NSObject))]
     interface OOOoyalaPlayer_Playback
     {
         // @property (readonly, getter = isPiPActivated, nonatomic) BOOL pipActivated;
@@ -1012,7 +1011,7 @@ namespace OoyalaSDK.tvOS
 
     // @interface MultiAudio (OOOoyalaPlayer) <OOMultiAudioProtocol>
     [Protocol]
-    [BaseType(typeof(OOOoyalaPlayer))]
+    [BaseType(typeof(NSObject))]
     interface OOOoyalaPlayer_MultiAudio : OOMultiAudioProtocol
     {
         // -(BOOL)hasMultipleAudioTracks;
