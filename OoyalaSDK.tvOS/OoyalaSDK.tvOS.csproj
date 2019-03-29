@@ -48,10 +48,6 @@
       <Kind>Framework</Kind>
       <Frameworks>VideoToolbox, JavaScriptCore, MediaPlayer, SystemConfiguration, QuartzCore, CoreImage, CoreVideo</Frameworks>
     </NativeReference>
-    <NativeReference Include="OoyalaTVSkinSDK-universal.a">
-      <Kind>Static</Kind>
-      <Frameworks>QuartzCore, CoreImage, CoreVideo</Frameworks>
-    </NativeReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\TVOS\Xamarin.TVOS.ObjCBinding.CSharp.targets" />
 </Project>

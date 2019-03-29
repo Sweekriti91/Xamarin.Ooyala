@@ -1,19 +1,12 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using ObjCRuntime;
+using OoyalaSDK;
 
 namespace OoyalaSDK.tvOS
 {
     [Native]
-    public enum OOClosedCaptionPresentation : long
-    {
-        PopOn,
-        RollUp,
-        PaintOn
-    }
-
-    [Native]
-    public enum OOOoyalaPlayerVideoGravity : long
+    public enum OOOoyalaPlayerVideoGravity : ulong
     {
         OOOoyalaPlayerVideoGravityResize,
         Aspect,
@@ -37,111 +30,6 @@ namespace OoyalaSDK.tvOS
     {
         laying,
         aused
-    }
-
-    [Native]
-    public enum OOAdMode : long
-    {
-        None,
-        ContentChanged,
-        InitialPlay,
-        Playhead,
-        CuePoint,
-        ContentFinished,
-        ContentError,
-        PluginInitiated
-    }
-
-    //[StructLayout (LayoutKind.Sequential)]
-    //public struct OOTBXMLAttribute
-    //{
-    //    public unsafe sbyte* name;
-
-    //    public unsafe sbyte* value;
-
-    //    public unsafe _OOTBXMLAttribute* next;
-    //}
-
-    //[StructLayout (LayoutKind.Sequential)]
-    //public struct OOTBXMLElement
-    //{
-    //    public unsafe sbyte* name;
-
-    //    public unsafe sbyte* text;
-
-    //    public unsafe OOTBXMLAttribute* firstAttribute;
-
-    //    public unsafe _OOTBXMLElement* parentElement;
-
-    //    public unsafe _OOTBXMLElement* firstChild;
-
-    //    public unsafe _OOTBXMLElement* currentChild;
-
-    //    public unsafe _OOTBXMLElement* nextSibling;
-
-    //    public unsafe _OOTBXMLElement* previousSibling;
-    //}
-
-    //[StructLayout (LayoutKind.Sequential)]
-    //public struct OOTBXMLElementBuffer
-    //{
-    //    public unsafe OOTBXMLElement* elements;
-
-    //    public unsafe _OOTBXMLElementBuffer* next;
-
-    //    public unsafe _OOTBXMLElementBuffer* previous;
-    //}
-
-    //[StructLayout (LayoutKind.Sequential)]
-    //public struct OOTBXMLAttributeBuffer
-    //{
-    //    public unsafe OOTBXMLAttribute* attributes;
-
-    //    public unsafe _OOTBXMLAttributeBuffer* next;
-
-    //    public unsafe _OOTBXMLAttributeBuffer* previous;
-    //}
-
-    [Native]
-    public enum OOReturnState : long
-    {
-        Matched,
-        Unmatched,
-        Fail
-    }
-
-    [Native]
-    public enum OOAuthCode : long
-    {
-        Unknown = -2,
-        NotRequested = -1,
-        Min = 0,
-        Authorized = 0,
-        UnauthorizedParent = 1,
-        UnauthorizedDomain = 2,
-        UnauthorizedLocation = 3,
-        BeforeFlightTime = 4,
-        AfterFlightTime = 5,
-        OutsideRecurringFlightTimes = 6,
-        BadEmbedCode = 7,
-        InvalidSignature = 8,
-        MissingParams = 9,
-        MissingRuleSet = 10,
-        Unauthorized = 11,
-        MissingPcode = 12,
-        UnauthorizedDevice = 13,
-        InvalidToken = 14,
-        TokenExpired = 15,
-        UnauthorizedMultiSyndGroup = 16,
-        ProviderDeleted = 17,
-        TooManyActiveStreams = 18,
-        MissingAccountId = 19,
-        NoEntitlementsFound = 20,
-        NonEntitledDevice = 21,
-        NonRegisteredDevice = 22,
-        ProviderOverCapTrial = 23,
-        ProxyDetected = 24,
-        Max = 24
     }
 
     [Native]
@@ -181,6 +69,45 @@ namespace OoyalaSDK.tvOS
     }
 
     [Native]
+    public enum OOIQAnalyticsTrackingState : ulong
+    {
+        Default,
+        Disabled,
+        Anonymous
+    }
+
+    [Native]
+    public enum OOAdMode : long
+    {
+        None,
+        ContentChanged,
+        InitialPlay,
+        Playhead,
+        CuePoint,
+        ContentFinished,
+        ContentError,
+        PluginInitiated
+    }
+
+    [Native]
+    public enum OOOoyalaPlayerJsonType : ulong
+    {
+        None = 0,
+        Id3,
+        ChannelInfo,
+        Metadata
+    }
+
+    [Native]
+    public enum OOAdType : ulong
+    {
+        Content = 0,
+        Preroll,
+        Midroll,
+        Postroll
+    }
+
+    [Native]
     public enum OOFCCTvRatingsPosition : long
     {
         TopLeft,
@@ -188,6 +115,56 @@ namespace OoyalaSDK.tvOS
         BottomLeft,
         BottomRight
     }
+
+    //[StructLayout(LayoutKind.Sequential)]
+    //public struct OOTBXMLAttribute
+    //{
+    //    public unsafe sbyte* name;
+
+    //    public unsafe sbyte* value;
+
+    //    public unsafe _OOTBXMLAttribute* next;
+    //}
+
+    //[StructLayout(LayoutKind.Sequential)]
+    //public struct OOTBXMLElement
+    //{
+    //    public unsafe sbyte* name;
+
+    //    public unsafe sbyte* text;
+
+    //    public unsafe OOTBXMLAttribute* firstAttribute;
+
+    //    public unsafe _OOTBXMLElement* parentElement;
+
+    //    public unsafe _OOTBXMLElement* firstChild;
+
+    //    public unsafe _OOTBXMLElement* currentChild;
+
+    //    public unsafe _OOTBXMLElement* nextSibling;
+
+    //    public unsafe _OOTBXMLElement* previousSibling;
+    //}
+
+    //[StructLayout(LayoutKind.Sequential)]
+    //public struct OOTBXMLElementBuffer
+    //{
+    //    public unsafe OOTBXMLElement* elements;
+
+    //    public unsafe _OOTBXMLElementBuffer* next;
+
+    //    public unsafe _OOTBXMLElementBuffer* previous;
+    //}
+
+    //[StructLayout(LayoutKind.Sequential)]
+    //public struct OOTBXMLAttributeBuffer
+    //{
+    //    public unsafe OOTBXMLAttribute* attributes;
+
+    //    public unsafe _OOTBXMLAttributeBuffer* next;
+
+    //    public unsafe _OOTBXMLAttributeBuffer* previous;
+    //}
 
     [Native]
     public enum RequiredType : long
@@ -220,6 +197,14 @@ namespace OoyalaSDK.tvOS
         Static,
         IFrame,
         Html
+    }
+
+    [Native]
+    public enum OOReturnState : long
+    {
+        Matched,
+        Unmatched,
+        Fail
     }
 
     [Native]
@@ -263,7 +248,51 @@ namespace OoyalaSDK.tvOS
         PlayerFormatMissmatch = 28,
         CreateVRPlayerFailed = 29,
         UnknownError = 30,
-        GeoBlockingError = 31
+        GeoBlockingError = 31,
+        EmbedCodeMetadataError = 32,
+        AdContentError = 33
+    }
+
+    [Native]
+    public enum OOAuthCode : long
+    {
+        Unknown = -2,
+        NotRequested = -1,
+        Min = 0,
+        Authorized = 0,
+        UnauthorizedParent = 1,
+        UnauthorizedDomain = 2,
+        UnauthorizedLocation = 3,
+        BeforeFlightTime = 4,
+        AfterFlightTime = 5,
+        OutsideRecurringFlightTimes = 6,
+        BadEmbedCode = 7,
+        InvalidSignature = 8,
+        MissingParams = 9,
+        MissingRuleSet = 10,
+        Unauthorized = 11,
+        MissingPcode = 12,
+        UnauthorizedDevice = 13,
+        InvalidToken = 14,
+        TokenExpired = 15,
+        UnauthorizedMultiSyndGroup = 16,
+        ProviderDeleted = 17,
+        TooManyActiveStreams = 18,
+        MissingAccountId = 19,
+        NoEntitlementsFound = 20,
+        NonEntitledDevice = 21,
+        NonRegisteredDevice = 22,
+        ProviderOverCapTrial = 23,
+        ProxyDetected = 24,
+        Max = 24
+    }
+
+    [Native]
+    public enum OOClosedCaptionPresentation : long
+    {
+        PopOn,
+        RollUp,
+        PaintOn
     }
 
     [Native]
@@ -280,6 +309,16 @@ namespace OoyalaSDK.tvOS
         None,
         LogOnly,
         LogAndAbort
+    }
+
+    [Watch(3, 0), TV(10, 0)]
+    [Native]
+    public enum NSURLSessionTaskMetricsResourceFetchType : long
+    {
+        Unknown,
+        NetworkLoad,
+        ServerPush,
+        LocalCache
     }
 
     [Native]
