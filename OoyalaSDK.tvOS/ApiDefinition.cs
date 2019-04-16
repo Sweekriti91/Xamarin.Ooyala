@@ -239,7 +239,8 @@ namespace OoyalaSDK.tvOS
     // @interface OOOoyalaPlayer : NSObject
     [BaseType(typeof(NSObject))]
     //Hack
-    interface OOOoyalaPlayer : OOOoyalaPlayer_Playback, OOOoyalaPlayer_MultiAudio,OOStateNotifier, OOOoyalaPlayer_AdPluginManagement
+    //interface OOOoyalaPlayer : OOOoyalaPlayer_Playback, OOOoyalaPlayer_MultiAudio,OOStateNotifier, OOOoyalaPlayer_AdPluginManagement
+    interface OOOoyalaPlayer : OOOoyalaPlayer_Playback, OOOoyalaPlayer_MultiAudio, OOOoyalaPlayer_AdPluginManagement, OOStateNotifier, OOOoyalaPlayer_Ads, OOOoyalaPlayer_AppEvents, OOOoyalaPlayer_PlaybackSpeed, OOOoyalaPlayer_Cast, OOOoyalaPlayer_PlaybackWorkflow, OOOoyalaPlayer_Channel, OOOoyalaPlayer_ClosedCaptions, OOOoyalaPlayer_MoviePlayerCreation, OOOoyalaPlayer_UI
     {
         // +(void)setEnvironment:(OOOoyalaPlayerEnvironment)e;
         [Static]
