@@ -44,12 +44,12 @@
     <ObjcBindingCoreSource Include="Structs.cs" />
   </ItemGroup>
   <ItemGroup>
-    <NativeReference Include="OoyalaTVSkinSDK.framework">
+    <NativeReference Include="OoyalaSDK.framework">
       <Kind>Framework</Kind>
       <SmartLink>True</SmartLink>
     </NativeReference>
-    <NativeReference Include="OoyalaSDK.framework">
-      <Kind>Framework</Kind>
+    <NativeReference Include="OoyalaTVSkinSDK-universal.a">
+      <Kind>Static</Kind>
       <SmartLink>True</SmartLink>
     </NativeReference>
   </ItemGroup>
