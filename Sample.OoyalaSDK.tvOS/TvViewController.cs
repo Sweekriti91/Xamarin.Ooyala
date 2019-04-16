@@ -1,5 +1,6 @@
 ﻿using UIKit;
 using OoyalaSDK.tvOS;
+using System.Diagnostics;
 
 namespace Sample.OoyalaSDK.tvOS
 {
@@ -19,6 +20,7 @@ namespace Sample.OoyalaSDK.tvOS
 
             Player.SetEmbedCode("Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1");
             Player.Play();
+            Debug.Write(Player.State.ToString()); 
         }
     }
 }

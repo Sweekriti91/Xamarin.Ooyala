@@ -44,13 +44,13 @@
     <ObjcBindingCoreSource Include="Structs.cs" />
   </ItemGroup>
   <ItemGroup>
+    <NativeReference Include="OoyalaTVSkinSDK.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>True</SmartLink>
+    </NativeReference>
     <NativeReference Include="OoyalaSDK.framework">
       <Kind>Framework</Kind>
-      <Frameworks>VideoToolbox, JavaScriptCore, MediaPlayer, SystemConfiguration, QuartzCore, CoreImage, CoreVideo</Frameworks>
-    </NativeReference>
-    <NativeReference Include="OoyalaTVSkinSDK-universal.a">
-      <Kind>Static</Kind>
-      <SmartLink>False</SmartLink>
+      <SmartLink>True</SmartLink>
     </NativeReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\TVOS\Xamarin.TVOS.ObjCBinding.CSharp.targets" />

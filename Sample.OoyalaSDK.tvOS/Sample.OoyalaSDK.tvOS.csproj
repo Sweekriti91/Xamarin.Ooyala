@@ -30,6 +30,7 @@
     <DeviceSpecificBuild>false</DeviceSpecificBuild>
     <MtouchVerbosity></MtouchVerbosity>
     <AssemblyName>Sample.OoyalaSDK.tvOS</AssemblyName>
+    <MtouchExtraArgs>-gcc_flags "-ObjC"</MtouchExtraArgs>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>pdbonly</DebugType>

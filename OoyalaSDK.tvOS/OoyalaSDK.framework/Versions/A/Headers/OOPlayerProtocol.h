@@ -7,47 +7,12 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreMedia/CMTimeRange.h>
+#import "OOPlayerState.h"
+
+#ifndef OOPlayerProtocol_h
+#define OOPlayerProtocol_h
 
 @class UIImage;
-
-/**
- * Defines different gravity modes, which control how video is adjusted to available screen size
- */
-typedef NS_ENUM(NSInteger, OOOoyalaPlayerVideoGravity) {
-  /** Specifies that the video should be stretched to fill the layer’s bounds. */
-  OOOoyalaPlayerVideoGravityResize,
-  /** Specifies that the player should preserve the video’s aspect ratio and fit the video within the layer’s bounds */
-  OOOoyalaPlayerVideoGravityResizeAspect,
-  /** Specifies that the player should preserve the video’s aspect ratio and fill the layer’s bounds. */
-  OOOoyalaPlayerVideoGravityResizeAspectFill
-};
-
-/**
- * Defines different possible player states
- */
-typedef NS_ENUM(NSUInteger, OOOoyalaPlayerState) {
-  /** Initial state, player is created but no content is loaded */
-  OOOoyalaPlayerStateInit,
-  /** Loading content */
-  OOOoyalaPlayerStateLoading,
-  /** Content is loaded and initialized, player is ready to begin playback */
-  OOOoyalaPlayerStateReady,
-  /** Player is playing a video */
-  OOOoyalaPlayerStatePlaying,
-  /** Player is paused, video is showing */
-  OOOoyalaPlayerStatePaused,
-  /** Player has finished playing content */
-  OOOoyalaPlayerStateCompleted,
-  /** Player has encountered an error, check OOOoyalaPlayer.error */
-  OOOoyalaPlayerStateError
-};
-
-typedef NS_ENUM(NSInteger, OOOoyalaPlayerDesiredState) {
-  /** user is playing a video */
-  OOOoyalaPlayerDesiredStatePlaying,
-  /** user is paused, video is showing */
-  OOOoyalaPlayerDesiredStatePaused,
-};
 
 @protocol OOPlayerProtocol<NSObject>
 
@@ -55,7 +20,7 @@ typedef NS_ENUM(NSInteger, OOOoyalaPlayerDesiredState) {
  * @returns YES if the player will put its own controls on-screen;
  * NO if the player wants the Ooyala controls to be used instead.
  */
-- (BOOL) hasCustomControls;
+- (BOOL)hasCustomControls;
 
 /**
  * This is called when pause is clicked
@@ -125,3 +90,5 @@ typedef NS_ENUM(NSInteger, OOOoyalaPlayerDesiredState) {
 @property (nonatomic) float volume; /** the player volume*/
 
 @end
+
+#endif // OOPlayerProtocol_h

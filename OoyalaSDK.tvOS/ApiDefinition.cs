@@ -239,7 +239,7 @@ namespace OoyalaSDK.tvOS
     // @interface OOOoyalaPlayer : NSObject
     [BaseType(typeof(NSObject))]
     //Hack
-    interface OOOoyalaPlayer : OOOoyalaPlayer_Playback, OOOoyalaPlayer_MultiAudio, OOOoyalaPlayer_AdPluginManagement
+    interface OOOoyalaPlayer : OOOoyalaPlayer_Playback, OOOoyalaPlayer_MultiAudio,OOStateNotifier, OOOoyalaPlayer_AdPluginManagement
     {
         // +(void)setEnvironment:(OOOoyalaPlayerEnvironment)e;
         [Static]
@@ -509,7 +509,7 @@ namespace OoyalaSDK.tvOS
         [Export("reauthorizeCurrentItemWithCallback:")]
         void ReauthorizeCurrentItemWithCallback(OOAuthorizeCallback callback);
 
-        // -(OOOoyalaPlayerState)state;
+         //-(OOOoyalaPlayerState)state;
         //[Export("state")]
         //OOOoyalaPlayerState State();
 
@@ -662,7 +662,7 @@ namespace OoyalaSDK.tvOS
 
     // @interface Ads (OOOoyalaPlayer)
     [Protocol]
-    [BaseType(typeof(OOOoyalaPlayer))]
+    [BaseType(typeof(NSObject))]
     interface OOOoyalaPlayer_Ads
     {
         // -(BOOL)needPlayAdsOnInitialContentPlay;
@@ -808,7 +808,7 @@ namespace OoyalaSDK.tvOS
 
     // @interface AppEvents (OOOoyalaPlayer)
     [Protocol]
-    [BaseType(typeof(OOOoyalaPlayer))]
+    [BaseType(typeof(NSObject))]
     interface OOOoyalaPlayer_AppEvents
     {
         // -(void)addAppLifeEventsObservers;
@@ -839,14 +839,14 @@ namespace OoyalaSDK.tvOS
 
     // @interface PlaybackSpeed (OOOoyalaPlayer) <OOPlaybackSpeedProtocol>
     [Protocol]
-    [BaseType(typeof(OOOoyalaPlayer))]
+    [BaseType(typeof(NSObject))]
     interface OOOoyalaPlayer_PlaybackSpeed : OOPlaybackSpeedProtocol
     {
     }
 
     // @interface Cast (OOOoyalaPlayer)
     [Protocol]
-    [BaseType(typeof(OOOoyalaPlayer))]
+    [BaseType(typeof(NSObject))]
     interface OOOoyalaPlayer_Cast
     {
         // -(void)initCastManager:(OOCastManager *)castManager;
@@ -870,7 +870,7 @@ namespace OoyalaSDK.tvOS
 
     // @interface PlaybackWorkflow (OOOoyalaPlayer)
     [Protocol]
-    [BaseType(typeof(OOOoyalaPlayer))]
+    [BaseType(typeof(NSObject))]
     interface OOOoyalaPlayer_PlaybackWorkflow
     {
         // -(void)prepareContent;
@@ -897,7 +897,7 @@ namespace OoyalaSDK.tvOS
 
     // @interface Channel (OOOoyalaPlayer)
     [Protocol]
-    [BaseType(typeof(OOOoyalaPlayer))]
+    [BaseType(typeof(NSObject))]
     interface OOOoyalaPlayer_Channel
     {
         // -(BOOL)nextVideo;
@@ -918,7 +918,7 @@ namespace OoyalaSDK.tvOS
 
     // @interface ClosedCaptions (OOOoyalaPlayer)
     [Protocol]
-    [BaseType(typeof(OOOoyalaPlayer))]
+    [BaseType(typeof(NSObject))]
     interface OOOoyalaPlayer_ClosedCaptions
     {
         // -(void)disablePlaylistClosedCaptions;
@@ -937,7 +937,7 @@ namespace OoyalaSDK.tvOS
 
     // @interface MoviePlayerCreation (OOOoyalaPlayer)
     [Protocol]
-    [BaseType(typeof(OOOoyalaPlayer))]
+    [BaseType(typeof(NSObject))]
     interface OOOoyalaPlayer_MoviePlayerCreation
     {
         // -(OOMoviePlayer *)getCorrectMoviePlayer:(OOVideo *)video;
@@ -948,7 +948,7 @@ namespace OoyalaSDK.tvOS
 
     // @interface UI (OOOoyalaPlayer)
     [Protocol]
-    [BaseType(typeof(OOOoyalaPlayer))]
+    [BaseType(typeof(NSObject))]
     interface OOOoyalaPlayer_UI
     {
         // -(void)showPromoImage;
