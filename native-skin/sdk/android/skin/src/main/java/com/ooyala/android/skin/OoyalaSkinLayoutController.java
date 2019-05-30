@@ -7,40 +7,45 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.media.AudioManager;
-import android.os.Build;
+import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
+
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
-import com.ooyala.android.*;
+import com.ooyala.android.ClientId;
+import com.ooyala.android.OoyalaException;
+import com.ooyala.android.OoyalaNotification;
+import com.ooyala.android.OoyalaPlayer;
+import com.ooyala.android.OoyalaPlayerLayout;
 import com.ooyala.android.captions.ClosedCaptionsStyle;
 import com.ooyala.android.discovery.DiscoveryManager;
 import com.ooyala.android.discovery.DiscoveryOptions;
 import com.ooyala.android.player.FCCTVRatingUI;
 import com.ooyala.android.player.VrMode;
-import com.ooyala.android.skin.configuration.SkinConfigManager;
 import com.ooyala.android.skin.configuration.SkinOptions;
-import com.ooyala.android.skin.notification.provider.AudioNotificationHandlersProvider;
-import com.ooyala.android.skin.notification.provider.NotificationHandlersProvider;
-import com.ooyala.android.skin.notification.provider.VideoNotificationHandlersProvider;
-import com.ooyala.android.skin.util.AssetUtil;
+import com.ooyala.android.skin.util.BundleJSONConverter;
 import com.ooyala.android.skin.util.ReactUtil;
+import com.ooyala.android.skin.util.SkinConfigUtil;
 import com.ooyala.android.ui.LayoutController;
 import com.ooyala.android.util.DebugMode;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Observable;
 
 import static com.ooyala.android.util.TvHelper.isTargetDeviceTV;
@@ -59,6 +64,18 @@ public class OoyalaSkinLayoutController extends Observable implements LayoutCont
 
   private static final double MAX_CARBOARD_DIAGONAL_INCH_VALUE = 6.5;
 
+  private static final String KEY_NAME = "name";
+  private static final String KEY_EMBEDCODE = "embedCode";
+  private static final String KEY_PERCENTAG = "percentage";
+  private static final String KEY_LANGUAGE = "language";
+  private static final String KEY_AVAILABLE_LANGUAGE_FILE = "availableLanguageFile";
+  private static final String KEY_ANDROID_RESOURCE = "androidResource";
+  private static final String KEY_LOCALIZATION = "localization";
+  private static final String KEY_LOCALE = "locale";
+  private static final String KEY_DEFAULT_LANGUAGE = "defaultLanguage";
+  private static final String KEY_BUCKETINFO = "bucketInfo";
+  private static final String KEY_ACTION = "action";
+
   public static final String CONTROLLER_KEY_PRESS_EVENT = "controllerKeyPressEvent";
 
   /**
@@ -74,7 +91,6 @@ public class OoyalaSkinLayoutController extends Observable implements LayoutCont
   private final int STOP_DIRECTION = 0;
   public static final String VR_MODE_CHANGED_NOTIFICATION_NAME = "vrModeChanged";
 
-  private SkinConfigManager configManager;
   private OoyalaSkinLayout _layout;
   private OoyalaReactPackage _package;
   private OoyalaPlayer _player;
@@ -136,9 +152,7 @@ public class OoyalaSkinLayoutController extends Observable implements LayoutCont
     _player = player;
     _player.setLayoutController(this);
 
-    NotificationHandlersProvider provider = player.isAudioOnly() ?
-        new AudioNotificationHandlersProvider(this, player) : new VideoNotificationHandlersProvider(this, player);
-    playerObserver = new OoyalaSkinPlayerObserver(player, provider);
+    playerObserver = new OoyalaSkinPlayerObserver(this, player);
     volumeObserver = new OoyalaSkinVolumeObserver(layout.getContext(), this);
     eventHandler = new OoyalaSkinBridgeEventHandlerImpl(this, player);
 
@@ -153,46 +167,46 @@ public class OoyalaSkinLayoutController extends Observable implements LayoutCont
     width = Math.round(_layout.getViewWidth() * cal);
     height = Math.round(_layout.getViewHeight() * cal);
 
+
     isReactMounted = false;
 
     initializeSkin(app, layout, player, skinOptions);
   }
 
-  private void initializeSkin(Application app, OoyalaSkinLayout skinLayout, OoyalaPlayer p, SkinOptions skinOptions) {
-    final Context context = skinLayout.getContext();
+  private void initializeSkin(Application app, OoyalaSkinLayout l, OoyalaPlayer p, SkinOptions skinOptions) {
+
     if (skinOptions.getEnableReactJSServer()) {
-      ReactUtil.setJSServer(skinOptions.getReactJSServerHost(), context);
+      ReactUtil.setJSServer(skinOptions.getReactJSServerHost(), l.getContext());
     }
-    initConfig(context, skinOptions);
-    initSkinViews(app, skinLayout, skinOptions);
-  }
+    JSONObject configJson = SkinConfigUtil.loadInitialProperties(l.getContext(), skinOptions.getSkinConfigAssetName());
+    SkinConfigUtil.applySkinOverridesInPlace(configJson, skinOptions.getSkinOverrides());
+    injectLocalizedResources(configJson, l.getContext());
+    saveUpNextSetting(configJson);
+    Bundle launchOptions = null; //Initial properties.
+    if (configJson != null) {
+      try {
+        launchOptions = BundleJSONConverter.convertToBundle(configJson);
+        closedCaptionsSkinStyle = configJson.getJSONObject("closedCaptionOptions");
+        setDefaultAudioLanguage(configJson);
+      } catch (JSONException e) {
+        e.printStackTrace();
+        launchOptions = null;
+      }
+    }
 
-  private void initConfig(Context context, SkinOptions skinOptions) {
-    JSONObject configJson = AssetUtil.loadJsonAsset(context, skinOptions.getSkinConfigAssetName());
-    configManager = new SkinConfigManager(configJson);
-    configManager.removeNullsFromPlaybackArray();
-    configManager.applySkinOverrides(skinOptions);
-    configManager.injectLocalizedResources(context);
-
-    _isUpNextEnabled = configManager.getShowUpNextOrDefault();
-
-    initDefaultAudioLanguageSetting();
-    initClosedCaptionsSkinStyleSetting();
-  }
-
-  private void initSkinViews(Application app, OoyalaSkinLayout l, SkinOptions skinOptions) {
     _package = new OoyalaReactPackage(this);
     rootView = new ReactRootView(l.getContext());
     _reactInstanceManager = ReactInstanceManager.builder()
         .setApplication(app)
         .setBundleAssetName(skinOptions.getBundleAssetName())
+        .setJSBundleFile("assets://index.android.jsbundle")
         .addPackage(_package)
         .setUseDeveloperSupport(BuildConfig.DEBUG)
         .setInitialLifecycleState(LifecycleState.RESUMED)
         .build();
     ccStyleChanged();
 
-    rootView.startReactApplication(_reactInstanceManager, "OoyalaSkin", configManager.toBundle());
+    rootView.startReactApplication(_reactInstanceManager, "OoyalaSkin", launchOptions);
 
     FrameLayout.LayoutParams frameLP =
         new FrameLayout.LayoutParams(
@@ -210,22 +224,6 @@ public class OoyalaSkinLayoutController extends Observable implements LayoutCont
     rootView.setFocusableInTouchMode(true);
     rootView.requestFocus();
     rootView.setOnKeyListener(this);
-  }
-
-  public ClosedCaptionsStyle getClosedCaptionsDeviceStyle() {
-    return closedCaptionsDeviceStyle;
-  }
-
-  public void setClosedCaptionsDeviceStyle(ClosedCaptionsStyle closedCaptionsDeviceStyle) {
-    this.closedCaptionsDeviceStyle = closedCaptionsDeviceStyle;
-  }
-
-  public int getWidth() {
-    return width;
-  }
-
-  public int getHeight() {
-    return height;
   }
 
   public void ccStyleChanged() {
@@ -248,24 +246,67 @@ public class OoyalaSkinLayoutController extends Observable implements LayoutCont
   }
 
   /**
-   * Set the default audio language from skin.json provided the language exists.
+   * Get locale of device and inject localized file content into provided json object.
+   *
+   * @param configJson
+   * @param context
    */
-  private void initDefaultAudioLanguageSetting() {
+  private void injectLocalizedResources(JSONObject configJson, Context context) {
+    String locale = Locale.getDefault().getLanguage();
+
     try {
-      String language = configManager.getAudioLanguage();
+      configJson.put(KEY_LOCALE, locale);
+      HashMap<String, String> languageFileNames = getLocaleLanguageFileNames(configJson);
+      JSONObject localizedResources = new JSONObject();
+      for (String languageKey : languageFileNames.keySet()) {
+        String path = languageFileNames.get(languageKey);
+        JSONObject localized = SkinConfigUtil.loadLocalizedResources(context, path);
+        if (localized != null) {
+          localizedResources.put(languageKey, localized);
+        }
+      }
+      if (localizedResources.length() > 0) {
+        JSONObject localizationJson = new JSONObject();
+        localizationJson.put(KEY_LOCALIZATION, localizedResources);
+        SkinConfigUtil.applySkinOverridesInPlace(configJson, localizationJson);
+      } else {
+        DebugMode.logE(TAG, "No localization files found.");
+      }
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private HashMap<String, String> getLocaleLanguageFileNames(JSONObject configJson) {
+    HashMap<String, String> languageFiles = new HashMap<>();
+    try {
+      JSONArray localeFiles = configJson.getJSONObject(KEY_LOCALIZATION).getJSONArray(KEY_AVAILABLE_LANGUAGE_FILE);
+
+      for (int i = 0; i < localeFiles.length(); i++) {
+        JSONObject jsonObject = (JSONObject) localeFiles.get(i);
+        String localeCode = jsonObject.getString(KEY_LANGUAGE);
+        String languageFile = jsonObject.getString(KEY_ANDROID_RESOURCE);
+        languageFiles.put(localeCode, languageFile);
+      }
+    } catch (JSONException e) {
+      // Localization file for current locale is not set in config. Ignore.
+    }
+    return languageFiles;
+  }
+
+  /**
+   * Set the default audio language from skin.json provided the language exists.
+   *
+   * @param audioParams The part of the config that define the default audio language.
+   */
+  private void setDefaultAudioLanguage(JSONObject audioParams) {
+    try {
+      String language = audioParams.getJSONObject("audio").getString("audioLanguage");
       if (language != null && !language.isEmpty()) {
         _player.setConfigDefaultAudioLanguage(language);
       }
     } catch (JSONException e) {
       // Localization file for default audio language is not set in config. Ignore.
-    }
-  }
-
-  public void initClosedCaptionsSkinStyleSetting() {
-    try {
-      closedCaptionsSkinStyle = configManager.getClosedCaptionOptions();
-    } catch (JSONException e) {
-      // Ignore
     }
   }
 
@@ -282,6 +323,15 @@ public class OoyalaSkinLayoutController extends Observable implements LayoutCont
       }
       WritableMap params = BridgeMessageBuilder.buildDiscoveryResultsReceivedParams(jsonResults);
       sendEvent("discoveryResultsReceived", params);
+    }
+  }
+
+
+  private void saveUpNextSetting(JSONObject config) {
+    try {
+      _isUpNextEnabled = config.getJSONObject("upNext").getBoolean("showUpNext");
+    } catch (JSONException e) {
+      DebugMode.logE(TAG, "Up Next Parse Failed, default not showing Up Next");
     }
   }
 
@@ -318,14 +368,9 @@ public class OoyalaSkinLayoutController extends Observable implements LayoutCont
     return _layout.getPlayerLayout();
   }
 
-  public float getCurrentVolume() {
+  public int getCurrentVolume() {
     AudioManager audioManager = (AudioManager) _layout.getContext().getSystemService(Context.AUDIO_SERVICE);
-    return (float)audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)/(float)audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-  }
-
-  public void setVolume(float volume) {
-    AudioManager audioManager = (AudioManager) _layout.getContext().getSystemService(Context.AUDIO_SERVICE);
-    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int)(volume*audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)), 0);
+    return audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
   }
 
   @Override
@@ -335,12 +380,7 @@ public class OoyalaSkinLayoutController extends Observable implements LayoutCont
         _player.setVRMode(VrMode.MONO);
       }
     }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-      final Activity activity = getActivity();
-      if (activity != null) {
-        _layout.setMultiWindowMode(activity.isInMultiWindowMode());
-      }
-    }
+
     _layout.setFullscreen(isFullscreen);
     sendNotification(FULLSCREEN_CHANGED_NOTIFICATION_NAME, isFullscreen);
   }
@@ -535,7 +575,7 @@ public class OoyalaSkinLayoutController extends Observable implements LayoutCont
   }
 
   void handlePlayPause() {
-    _player.handlePlayPause(false);
+    _player.handlePlayPause();
   }
 
   void handleLearnMore() {
@@ -553,7 +593,7 @@ public class OoyalaSkinLayoutController extends Observable implements LayoutCont
     sendEvent("upNextDismissed", body);
   }
 
-  public void maybeStartUpNext() {
+  void maybeStartUpNext() {
     if (nextVideoEmbedCode != null && _isUpNextEnabled && !_isUpNextDismissed) {
       _player.setEmbedCode(nextVideoEmbedCode);
       _player.play();
@@ -564,7 +604,7 @@ public class OoyalaSkinLayoutController extends Observable implements LayoutCont
     _player.onAdIconClicked(index);
   }
 
-  public void requestDiscovery() {
+  void requestDiscovery() {
     discoveryOptions = new DiscoveryOptions.Builder().build();
     DiscoveryManager.getResults(discoveryOptions,
         _player.getEmbedCode(),
@@ -596,15 +636,7 @@ public class OoyalaSkinLayoutController extends Observable implements LayoutCont
     sendEvent("frameChanged", params);
   }
 
-  @Override
-  public void onFullscreenToggleCallback() {
-    WritableMap params = Arguments.createMap();
-    params.putBoolean("fullscreen", isFullscreen());
-
-    sendEvent("fullscreenToggled", params);
-  }
-
-  public void sendEvent(String event, WritableMap map) {
+  void sendEvent(String event, WritableMap map) {
     if (_package.getBridge() != null && isReactMounted) {
       _package.getBridge().sendEvent(event, map);
     } else {

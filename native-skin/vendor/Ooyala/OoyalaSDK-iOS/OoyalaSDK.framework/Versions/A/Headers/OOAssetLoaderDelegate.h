@@ -2,7 +2,7 @@
 //  OOAssetLoaderDelegate.h
 //  OoyalaSDK
 //
-//  Created on 1/25/16.
+//  Created by Zhihui Chen on 1/25/16.
 //  Copyright © 2016 Ooyala, Inc. All rights reserved.
 //
 
@@ -13,10 +13,9 @@
 @protocol OOFairplayContentKeyDelegate;
 
 @interface OOAssetLoaderDelegate : NSObject<AVAssetResourceLoaderDelegate>
+-(instancetype) init ;
 
-- (instancetype)init NS_UNAVAILABLE;
-
-- (instancetype)initWithAsset:(AVURLAsset *)asset
+-(instancetype) initWithAsset:(AVURLAsset *)asset
                         pcode:(NSString *)pcode
                     authToken:(NSString *)authToken
            secureURLGenerator:(id<OOSecureURLGenerator>)secureURLGenerator
@@ -38,5 +37,4 @@
  * It should be nil for regular stream assets.
  */
 @property (nonatomic) NSURL *fairplayKeyURL;
-
 @end

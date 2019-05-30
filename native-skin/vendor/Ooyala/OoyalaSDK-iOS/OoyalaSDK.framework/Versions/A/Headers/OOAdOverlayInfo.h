@@ -2,7 +2,7 @@
 //  OOAdOverlayInfo.h
 //  OoyalaSDK
 //
-//  Created on 5/4/16.
+//  Created by Yi Gu on 5/4/16.
 //  Copyright © 2016 Ooyala, Inc. All rights reserved.
 //
 

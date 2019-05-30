@@ -47,10 +47,10 @@
     <NativeReference Include="OoyalaSDK.framework">
       <Kind>Framework</Kind>
       <SmartLink>True</SmartLink>
+      <LinkerFlags>-ObjC</LinkerFlags>
     </NativeReference>
     <NativeReference Include="OoyalaTVSkinSDK-universal.a">
       <Kind>Static</Kind>
-      <SmartLink>False</SmartLink>
     </NativeReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\TVOS\Xamarin.TVOS.ObjCBinding.CSharp.targets" />

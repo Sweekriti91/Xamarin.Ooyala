@@ -5,12 +5,10 @@
 //  Copyright © 2017 Ooyala, Inc. All rights reserved.
 //
 
-@import UIKit;
-
 @protocol OOTimeSliderDelegate
 
-- (void)onTimeScrubbingStarted:(CGFloat)absoluteValue;
-- (void)onTimeScrubbingChanged:(CGFloat)absoluteValue;
-- (void)onTimeScrubbingEnded:(CGFloat)absoluteValue;
+- (void)onTimeScrubbingStarted:(float)absoluteValue;
+- (void)onTimeScrubbingChanged:(float)absoluteValue;
+- (void)onTimeScrubbingEnded:(float)absoluteValue;
 
 @end

@@ -6,6 +6,7 @@
 //  Copyright © 2015 ooyala. All rights reserved.
 //
 
+#import <UIKit/UIKit.h>
 #import <React/RCTBridgeModule.h>
 
 

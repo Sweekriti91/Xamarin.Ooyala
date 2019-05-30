@@ -44,7 +44,7 @@ namespace Sample.OoyalaSDK.Droid
                 adapter.Add(video.Title);
             }
             listview.Adapter = adapter;
-            listview.ItemClick += Listview_ItemClick; ;
+            listview.ItemClick += Listview_ItemClick;
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)

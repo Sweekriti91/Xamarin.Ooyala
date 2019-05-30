@@ -13,38 +13,35 @@ import {
   View,
   Slider,
   NativeModules,
-  AccessibilityInfo,
-  Platform
+  AccessibilityInfo
 } from 'react-native';
 
-import {
+const Constants = require('./constants');
+const {
   VIEW_NAMES,
   UI_SIZES,
+  PLATFORMS,
   VALUES,
-  ANNOUNCER_TYPES,
-  VIEW_ACCESSIBILITY_NAMES
-} from './constants';
+  ANNOUNCER_TYPES
+} = Constants;
 
 const AndroidAccessibility = NativeModules.AndroidAccessibility;
 const AccessibilityUtils = require('./accessibilityUtils');
 const Log = require('./log');
 const Utils = require('./utils');
-const ProgressBar = require('./common/progressBar');
+const ProgressBar = require('./progressBar');
 const ControlBar = require('./controlBar');
 const ResponsiveDesignManager = require('./responsiveDesignManager');
-const styles = Utils.getStyles(require('./style/bottomOverlayStyles.json'));
 
+const styles = Utils.getStyles(require('./style/bottomOverlayStyles.json'));
 const topMargin = 6;
 const leftMargin = 20;
 const progressBarHeight = 3;
-const padding = 3;
 const scrubberSize = 14;
 const scrubTouchableDistance = 45;
 const cuePointSize = 8;
-
 let previousAnnouncing = 0;
 const accessibilityDelay = 2000; // Workaround for accessibility announcing for Android.
-const accessibilityProgressDelay = 5000; // Workaround for accessibility announcing for Android.
 const BottomOverlay = createReactClass({
   displayName: 'BottomOverlay',
 
@@ -67,10 +64,11 @@ const BottomOverlay = createReactClass({
     shouldShowLandscape: PropTypes.bool,
     screenReaderEnabled: PropTypes.bool,
     config: PropTypes.object,
+    closedCaptionsEnabled: PropTypes.bool,
     stereoSupported: PropTypes.bool,
+    multiAudioEnabled: PropTypes.bool,
     showMoreOptionsButton: PropTypes.bool,
-    showAudioAndCCButton: PropTypes.bool,
-    showPlaybackSpeedButton: PropTypes.bool
+    showAudioAndCCButton: PropTypes.bool
   },
 
   getDefaultProps: function() {
@@ -133,26 +131,26 @@ const BottomOverlay = createReactClass({
   */
   componentWillReceiveProps: function(nextProps) {
     if (this.props.playhead !== nextProps.playhead) {
-      this.setState({cachedPlayhead: -1.0});
+       this.setState({cachedPlayhead:-1.0});
     }
   },
 
-  _calculateProgressBarWidth: function() {
+  _renderProgressBarWidth: function() {
     return this.props.width - 2 * leftMargin;
   },
 
-  _calculateTopOffset: function(componentSize) {
-    return topMargin + padding + progressBarHeight / 2 - componentSize / 2;
+  _renderTopOffset: function(componentSize) {
+    return topMargin + progressBarHeight / 2 - componentSize / 2;
   },
 
-  _calculateLeftOffset: function(componentSize, percent, progressBarWidth) {
+  _renderLeftOffset: function(componentSize, percent, progressBarWidth) {
     return leftMargin + percent * progressBarWidth - componentSize / 2
   },
 
   _renderProgressScrubber: function(percent) {
-    const progressBarWidth = this._calculateProgressBarWidth();
-    const topOffset = this._calculateTopOffset(scrubberSize);
-    const leftOffset = this._calculateLeftOffset(scrubberSize, percent, progressBarWidth);
+    const progressBarWidth = this._renderProgressBarWidth();
+    const topOffset = this._renderTopOffset(scrubberSize);
+    const leftOffset = this._renderLeftOffset(scrubberSize, percent, progressBarWidth);
     const positionStyle = {top:topOffset, left:leftOffset};
     const scrubberStyle = this._customizeScrubber();
 
@@ -160,8 +158,7 @@ const BottomOverlay = createReactClass({
       <View
         testID={VIEW_NAMES.TIME_SEEK_BAR_THUMB}
         accessible={false}
-        importantForAccessibility="no-hide-descendants"
-        accessibilityLabel=""
+        accessibilityLabel={VIEW_NAMES.TIME_SEEK_BAR_THUMB}
         style={[scrubberStyle, positionStyle, {width:scrubberSize, height:scrubberSize}]}>
       </View>
       );
@@ -196,20 +193,7 @@ const BottomOverlay = createReactClass({
   },
 
   _renderProgressBar: function(percent) {
-    return (
-      <View 
-        style={styles.progressBarContainer}
-        accessible={false}>
-          <ProgressBar
-            accessible={false}
-            ref='progressBar'
-            percent={percent}
-            config={this.props.config}
-            ad={this.props.ad}
-            renderDuration={false}>
-          </ProgressBar>
-      </View>
-    );
+    return (<ProgressBar accessible={false} ref='progressBar' percent={percent} config={this.props.config} ad={this.props.ad}/>);
   },
 
   _renderCompleteProgressBar: function() {
@@ -221,14 +205,9 @@ const BottomOverlay = createReactClass({
       playedPercent = this.playedPercent(this.state.cachedPlayhead, this.props.duration);
     }
 
-    const currentPercent = parseInt(playedPercent * 100, 10);
-    const scrubberBarAccessibilityLabel = Platform.select({
-      ios: VIEW_ACCESSIBILITY_NAMES.PROGRESS_BAR,
-      android: VIEW_ACCESSIBILITY_NAMES.PROGRESS_BAR + currentPercent +
-               VIEW_ACCESSIBILITY_NAMES.PROGRESS_BAR_ANDROID_SPECIFIC
-    });
+    const scrubberBarAccessibilityLabel = Constants.VIEW_ACCESSIBILITY_NAMES.PROGRESS_BAR;
 
-    if (Platform.OS === 'ios' && this.props.screenReaderEnabled) {
+    if (this.props.platform === PLATFORMS.IOS && this.props.screenReaderEnabled) {
       const minimumTrackTintColor = this.props.config.controlBar.scrubberBar.playedColor || this.props.config.general.accentColor;
       const maximumTrackTintColor = this.props.config.controlBar.scrubberBar.bufferedColor;
 
@@ -246,38 +225,21 @@ const BottomOverlay = createReactClass({
         </Slider>
       );
     } else {
-      const currentAnnouncing = new Date().getTime();
-
-      if ((previousAnnouncing === 0 || currentAnnouncing - previousAnnouncing > accessibilityProgressDelay)
-              && currentPercent !== VALUES.MAX_PROGRESS_PERCENT) {
-        previousAnnouncing = currentAnnouncing;
-        return this._renderDefaultProgressBar(playedPercent, scrubberBarAccessibilityLabel)
-      } else {
-        if (Platform.OS === 'android' && currentPercent === VALUES.MAX_PROGRESS_PERCENT && previousAnnouncing !== 0) {
-          AndroidAccessibility.announce(scrubberBarAccessibilityLabel);
-          previousAnnouncing = 0
-        }
-        return this._renderDefaultProgressBar(playedPercent, "")
-      }
+      return (
+        <Animated.View
+          testID={VIEW_NAMES.TIME_SEEK_BAR}
+          accessible={this.state.accessibilityEnabled}
+          accessibilityLabel={scrubberBarAccessibilityLabel}
+          onTouchStart={(event) => this.handleTouchStart(event)}
+          onTouchMove={(event) => this.handleTouchMove(event)}
+          onTouchEnd={(event) => this.handleTouchEnd(event)}
+          style={styles.progressBarStyle}>
+          {this._renderProgressBar(playedPercent)}
+          {this._renderProgressScrubber(!this.props.ad && this.state.touch ? this.touchPercent(this.state.x) : playedPercent)}
+          {this._renderCuePoints(this.props.cuePoints)}
+        </Animated.View>
+      )
     }
-  },
-
-  _renderDefaultProgressBar: function (playedPercent, scrubberBarAccessibilityLabel) {
-    return (
-            <Animated.View
-              testID={VIEW_NAMES.TIME_SEEK_BAR}
-              accessible={this.state.accessibilityEnabled}
-              accessibilityLabel={scrubberBarAccessibilityLabel}
-              importantForAccessibility="yes"
-              onTouchStart={(event) => this.handleTouchStart(event)}
-              onTouchMove={(event) => this.handleTouchMove(event)}
-              onTouchEnd={(event) => this.handleTouchEnd(event)}
-              style={styles.progressBarStyle}>
-              {this._renderProgressBar(playedPercent)}
-              {this._renderProgressScrubber(!this.props.ad && this.state.touch ? this.touchPercent(this.state.x) : playedPercent)}
-              {this._renderCuePoints(this.props.cuePoints)}
-            </Animated.View>
-    );
   },
 
   _onValueChange: function(value) {
@@ -293,7 +255,7 @@ const BottomOverlay = createReactClass({
     this.props.onScrub(seekPercent);
   },
 
-  _calculateCuePointsLeftOffset: function(cuePoint, progressBarWidth) {
+  _getCuePointLeftOffset: function(cuePoint, progressBarWidth) {
     let cuePointPercent = cuePoint / this.props.duration;
     if (cuePointPercent > 1) {
       cuePointPercent = 1;
@@ -301,7 +263,7 @@ const BottomOverlay = createReactClass({
     if (cuePointPercent < 0) {
       cuePointPercent = 0;
     }
-    const leftOffset = this._calculateLeftOffset(cuePointSize, cuePointPercent, progressBarWidth);
+    const leftOffset = this._renderLeftOffset(cuePointSize, cuePointPercent, progressBarWidth);
     return leftOffset;
   },
 
@@ -310,15 +272,15 @@ const BottomOverlay = createReactClass({
       return;
     }
     const cuePointsView = [];
-    const progressBarWidth = this._calculateProgressBarWidth();
-    const topOffset = this._calculateTopOffset(cuePointSize);
+    const progressBarWidth = this._renderProgressBarWidth();
+    const topOffset = this._renderTopOffset(cuePointSize);
     let leftOffset = 0;
     let positionStyle;
     let cuePointView;
 
     for (var i = 0; i < cuePoints.length; i++) {
       var cuePoint = cuePoints[i];
-      leftOffset = this._calculateCuePointsLeftOffset(cuePoint, progressBarWidth);
+      leftOffset = this._getCuePointLeftOffset(cuePoint, progressBarWidth);
       positionStyle = {top:topOffset, left:leftOffset};
       cuePointView = (
         <View
@@ -337,6 +299,7 @@ const BottomOverlay = createReactClass({
       <ControlBar
         ref='controlBar'
         primaryButton={this.props.primaryButton}
+        platform={this.props.platform}
         playhead={this.props.playhead}
         duration={this.props.duration}
         volume={this.props.volume}
@@ -348,10 +311,11 @@ const BottomOverlay = createReactClass({
         handleControlsTouch={this.props.handleControlsTouch}
         showWatermark={this.props.showWatermark}
         config={this.props.config}
+        closedCaptionsEnabled={this.props.closedCaptionsEnabled}
         stereoSupported={this.props.stereoSupported}
+        multiAudioEnabled={this.props.multiAudioEnabled}
         showMoreOptionsButton={this.props.showMoreOptionsButton}
         showAudioAndCCButton={this.props.showAudioAndCCButton}
-        showPlaybackSpeedButton={this.props.showPlaybackSpeedButton}
       />
     );
   },
@@ -395,7 +359,7 @@ const BottomOverlay = createReactClass({
     if (this.isMounted()) {
       this.setState({x:event.nativeEvent.pageX});
     }
-    if (Platform.OS === 'android') {
+    if (this.props.platform === PLATFORMS.ANDROID) {
       const playedPercent =  this.touchPercent(event.nativeEvent.pageX);
       const currentPercent = parseInt(playedPercent * 100, 10);
       const announcingLabel = AccessibilityUtils.createAccessibilityAnnouncers(ANNOUNCER_TYPES.MOVING, currentPercent);
@@ -417,7 +381,7 @@ const BottomOverlay = createReactClass({
      }
      this.setState({touch:false, x:null});
 
-     if (Platform.OS === 'android') {
+     if (this.props.platform === PLATFORMS.ANDROID) {
        const playedPercent =  this.touchPercent(event.nativeEvent.pageX);
        const currentPercent = parseInt(playedPercent * 100, 10);
        const announcingLabel = AccessibilityUtils.createAccessibilityAnnouncers(ANNOUNCER_TYPES.MOVED, currentPercent);
@@ -434,7 +398,7 @@ const BottomOverlay = createReactClass({
         {this._renderCompleteProgressBar()}
         {<View style ={[styles.bottomOverlayFlexibleSpace]}/>}
         {this._renderControlBar()}
-        {<View style ={[styles.bottomOverlayFlexibleSpace]}/>}
+        {<View style ={[styles.bottomOverlayFlexibleSpace]}/> }
       </Animated.View>
     );
   },
@@ -448,15 +412,12 @@ const BottomOverlay = createReactClass({
   },
 
   render: function() {
-    if (this.props.config.controlBar.enabled || this.props.config.controlBar.enabled == null) {
     var widthStyle = {width:this.props.width, opacity:this.state.opacity};
-        if (this.props.live && (this.props.config.live != null && this.props.config.live.forceDvrDisabled)) {
-          return this.renderLiveWithoutDVR(widthStyle);
-        }
-        return this.renderDefault(widthStyle);
-    } else {
-        return null;
+    if (this.props.live && (this.props.config.live != null && this.props.config.live.forceDvrDisabled)) {
+      return this.renderLiveWithoutDVR(widthStyle);
     }
+
+    return this.renderDefault(widthStyle);
   },
 });
 

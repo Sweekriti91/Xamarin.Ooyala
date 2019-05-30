@@ -10,7 +10,7 @@ namespace Sample.OoyalaSDK.tvOS
         {
             base.LoadView();
 
-            ProgressTintColor = UIColor.Red;
+            ProgressTintColor = UIColor.Yellow;
 
             OODebugMode.SetDebugMode(DebugMode.LogAndAbort);
 

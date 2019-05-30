@@ -7,11 +7,7 @@
 
 #import "OOScalableImageButton.h"
 
-#ifndef OOFullscreenButton_h
-#define OOFullscreenButton_h
 
 @interface OOFullscreenButton : OOScalableImageButton
 
 @end
-
-#endif /* OOFullscreenButton_h */

@@ -3,10 +3,10 @@ jest.dontMock( '../log.js' );
 describe( 'Log Tests', function() {
 
   var Log;
-
-  import {
+  var Constants = require('../constants');
+  var {
     LOG_LEVEL,
-  } from '../constants';
+  } = Constants;
 
   beforeEach(function() {
     Log = require('../log.js');

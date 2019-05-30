@@ -18,10 +18,12 @@ import {
   View,
 } from 'react-native';
 
-import {
+var animationDuration = 1000;
+var Constants = require('../constants');
+var {
   BUTTON_NAMES,
   ICONS
-} from '../constants';
+} = Constants;
 
 var ToggleSwitch = require('../widgets/ToggleSwitch');
 var Utils = require('../utils');
@@ -29,8 +31,6 @@ var ResponsiveList = require('../widgets/ResponsiveList');
 var PreviewWidget = require('../languageSelectionPreview');
 var styles = require('../utils').getStyles(require('./style/languageSelectionPanelStyles'));
 var panelStyles = require('./style/panelStyles');
-
-var animationDuration = 1000;
 
 class LanguageSelectionPanel extends React.Component {
   static propTypes = {

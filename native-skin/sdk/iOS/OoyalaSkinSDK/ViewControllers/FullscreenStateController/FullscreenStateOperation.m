@@ -34,11 +34,12 @@
               enterFullscreenBlock:(void (^)(void (^animationCompletion)()))fullscreenBlock
                   enterInlineBlock:(void (^)(void (^animationCompletion)()))inlineBlock
            andCompleteStateChanges:(void (^)())completeStateChanges {
-  if (self = [super init]) {
-    _isFullscreen = isFullscreen;
-    _fullscreenBlock = fullscreenBlock;
-    _inlineBlock = inlineBlock;
-    _completeStateChanges = completeStateChanges;
+  self = [super init];
+  if (self) {
+    self.isFullscreen = isFullscreen;
+    self.fullscreenBlock = fullscreenBlock;
+    self.inlineBlock = inlineBlock;
+    self.completeStateChanges = completeStateChanges;
   }
   return self;
 }
@@ -82,9 +83,11 @@
   dispatch_group_wait(dispatchGroup, DISPATCH_TIME_FOREVER);
   
   // Call completion block
+  
   self.completeStateChanges();
   
   // Finish operation
+  
   [self completeOperation];
 }
 
@@ -116,6 +119,7 @@
 - (void)cancelOperation {
   
   // Move the operation to the finished state if it is canceled
+  
   [self willChangeValueForKey:@"isFinished"];
   self.finished = YES;
   [self didChangeValueForKey:@"isFinished"];

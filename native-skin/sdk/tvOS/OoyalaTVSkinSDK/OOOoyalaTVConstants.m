@@ -2,7 +2,7 @@
 //  OOOoyalaTVConstants.m
 //  OoyalaTVSkinSDK
 //
-//  Created on 7/19/16.
+//  Created by Yi Gu on 7/19/16.
 //  Copyright © 2016 ooyala. All rights reserved.
 //
 
@@ -26,6 +26,6 @@ CGFloat const barTailDistance = headDistance + componentSpace + labelWidth;
 CGFloat const playheadLabelX = headDistance + playPauseButtonWidth + componentSpace;
 CGFloat const barX = playheadLabelX + componentSpace + labelWidth;
 
-CGFloat const SWIPE_TO_SEEK_MULTIPLIER = 0.5;
+CGFloat const SWIPE_TO_SEEK_MULTIPLIER = 0.25;
 CGFloat const SWIPE_TO_SEEK_MIN_THRESHOLD = 10.0;
 CGFloat const FF_SEEK_STEP = 10.0;

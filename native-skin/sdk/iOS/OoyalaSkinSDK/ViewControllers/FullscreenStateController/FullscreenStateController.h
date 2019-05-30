@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 
+
 @class UIView;
 @class UIViewController;
 
@@ -18,9 +19,6 @@
                                  videoView:(nonnull UIView *)videoView
                andFullscreenViewController:(nonnull UIViewController *)fullscreenViewController;
 
-- (void)setFullscreen:(BOOL)fullscreen
-withOrientaionChanges:(BOOL)isOrientaionChanges
-           completion:(nullable void (^)())completion;
-- (void)viewWillTransition:(BOOL)isAutoFullscreenWithRotatedEnabled;
+- (void)setFullscreen:(BOOL)fullscreen completion:(nullable void (^)())completion;
 
 @end

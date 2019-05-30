@@ -2,7 +2,7 @@
 //  OOOoyalaTVButton.m
 //  OoyalaTVSkinSDK
 //
-//  Created on 7/19/16.
+//  Created by Yi Gu on 7/19/16.
 //  Copyright © 2016 ooyala. All rights reserved.
 //
 
@@ -10,23 +10,30 @@
 
 @interface OOOoyalaTVButton ()
 
-@property (nonatomic) NSString *fontString;
+@property (nonatomic, strong) NSString *fontString;
 
 @end
 
 @implementation OOOoyalaTVButton
 
-- (instancetype)initWithFrame:(CGRect)frame {
-  if (self = [super initWithFrame:frame]) {
+- (id)initWithFrame:(CGRect)frame {
+  self = [super initWithFrame:frame];
+  
+  if (self) {
     self.titleLabel.textAlignment = NSTextAlignmentCenter;
-    self.titleLabel.font = [UIFont fontWithName:@"ooyala-slick-type"
-                                           size:self.OOFontSize != 0.0 ? self.OOFontSize : 40.0];
+    if (self.OOFontSize) {
+      [self.titleLabel setFont:[UIFont fontWithName:@"ooyala-slick-type" size:self.OOFontSize]];
+    } else {
+      [self.titleLabel setFont:[UIFont fontWithName:@"ooyala-slick-type" size:40.0]];
+    }
   }
+  
   return self;
 }
 
-- (void)changePlayingState:(BOOL)isVideoPlaying {
+- (void)changePlayingState: (BOOL)isVideoPlaying {
   self.fontString = isVideoPlaying ? @"g": @"v";
+  
   [self setTitle:self.fontString forState:UIControlStateNormal];
 }
 

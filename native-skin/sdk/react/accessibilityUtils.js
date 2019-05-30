@@ -5,13 +5,14 @@
 'use strict';
 
 import React, { Component } from 'react'
-import {
+import Constants from './constants.js'
+
+const {
   VIEW_ACCESSIBILITY_NAMES,
   ACCESSIBILITY_ANNOUNCERS,
   ANNOUNCER_TYPES,
-  CELL_TYPES,
-  ACCESSIBILITY_COMMON
-} from './constants'
+  CELL_TYPES
+} = Constants;
 
 let AccessibilityUtils = {
 
@@ -21,15 +22,9 @@ let AccessibilityUtils = {
         return param + " " + VIEW_ACCESSIBILITY_NAMES.MULTI_AUDIO_CELL;
       case CELL_TYPES.SUBTITLES:
         return param + " " + VIEW_ACCESSIBILITY_NAMES.CC_CELL;
-      case CELL_TYPES.PLAYBACK_SPEED_RATE:
-        return param + " " + VIEW_ACCESSIBILITY_NAMES.PLAYBACK_SPEED_CELL;
       default:
         return "";
     }
-  },
-
-  createAccessibilityLabelForSelectedObject: function(selectedObject) {
-    return ACCESSIBILITY_COMMON.SELECTED + " " + selectedObject;
   },
 
   createAccessibilityAnnouncers: function(announcerType, param) {

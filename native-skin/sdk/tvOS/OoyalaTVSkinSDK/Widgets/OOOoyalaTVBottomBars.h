@@ -2,6 +2,7 @@
 //  OOOoyalaBottomTVBars.h
 //  OoyalaTVSkinSDK
 //
+//  Created by Yi Gu on 7/21/16.
 //  Copyright © 2016 ooyala. All rights reserved.
 //
 
@@ -9,16 +10,11 @@
 
 @interface OOOoyalaTVBottomBars : UIView
 
-- (instancetype)initWithBackground:(UIView *)background
-                     withTintColor:(UIColor *)tintColor;
-
+- (id)initWithBackground:(UIView *)background
+                 withTintColor:(UIColor *)tintColor;
 - (void)updateBarBuffer:(CGFloat)bufferTime
                playhead:(CGFloat)playheadTime
                duration:(CGFloat)duration
             totalLength:(CGFloat)length;
-
-- (void)updateProgressBarTime:(CGFloat)time
-                   duration:(CGFloat)duration
-                totalLength:(CGFloat)length;
 
 @end

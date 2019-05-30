@@ -7,11 +7,7 @@
 
 #import "OOScalableImageButton.h"
 
-#ifndef OOClosedCaptionsButton_h
-#define OOClosedCaptionsButton_h
 
 @interface OOClosedCaptionsButton : OOScalableImageButton
 
 @end
-
-#endif

@@ -3747,7 +3747,7 @@ namespace OoyalaSDK.tvOS
         NSObject[] EmbedCodesToAuthorize { get; }
     }
 
-    // @protocol OOAdSpotPluginDelegate
+    // @protocol OOEmbeddedSecureURLGenerator
     [Protocol, Model]
     interface OOAdSpotPluginDelegate
     {

@@ -4,9 +4,10 @@
  */
 'use strict';
 
-import {
-  LOG_LEVEL
-} from './constants';
+var Constants = require('./constants');
+var {
+  LOG_LEVEL,
+} = Constants;
 
 var level = LOG_LEVEL.INFO;
 

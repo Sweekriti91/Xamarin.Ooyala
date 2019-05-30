@@ -2,7 +2,7 @@
 //  OOOoyalaTVLabel.h
 //  OoyalaTVSkinSDK
 //
-//  Created on 7/20/16.
+//  Created by Yi Gu on 7/20/16.
 //  Copyright © 2016 ooyala. All rights reserved.
 //
 
@@ -10,11 +10,11 @@
 
 @interface OOOoyalaTVLabel : UILabel
 
-@property (nonatomic) UIColor *OOTextColor;
+@property (nonatomic, strong) UIColor * OOTextColor;
 @property (nonatomic) NSTextAlignment OOTextAlighment;
 @property (nonatomic) CGFloat OOFontSize;
-@property (nonatomic) NSDateFormatter *OODateformatter;
+@property (nonatomic, strong) NSDateFormatter *OODateformatter;
 
-- (instancetype)initWithFrame:(CGRect)frame time:(CGFloat)time;
+- (id)initWithFrame:(CGRect)frame time:(CGFloat)time;
 
 @end

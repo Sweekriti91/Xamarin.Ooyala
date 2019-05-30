@@ -21,6 +21,5 @@
  @param[in] slider the existing UIProgressSlider render with
  @returns an initialized OOBufferView, or nil
  */
-- (instancetype)initWithFrame:(CGRect)frame slider:(OOProgressSliderView *)slider;
-
+- (instancetype)initWithFrame:(CGRect)frame slider:(OOProgressSliderView*)slider;
 @end

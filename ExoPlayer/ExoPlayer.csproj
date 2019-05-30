@@ -81,7 +81,7 @@
   <ItemGroup>
     <Folder Include="Jars\" />
   </ItemGroup>
-  <ItemGroup>
+     <ItemGroup>
     <LibraryProjectZip Include="Jars\library-release.aar" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.Bindings.targets" />

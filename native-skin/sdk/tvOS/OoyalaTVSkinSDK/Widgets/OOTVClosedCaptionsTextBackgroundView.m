@@ -7,16 +7,18 @@
 
 #import "OOTVClosedCaptionsTextBackgroundView.h"
 
+
 @implementation OOTVClosedCaptionsTextBackgroundView
 
 #pragma mark - Initializaiton
 
-- (instancetype)initWithFrame:(CGRect)frame {
-  if (self = [super initWithFrame:frame]) {
-    _shadowOffset = CGSizeMake(0, 0);
-    _shadowOpacity = 0;
-    _highlightColor = UIColor.clearColor;
-    _highlightOpacity = 0;
+- (id)initWithFrame:(CGRect)frame {
+  self = [super initWithFrame:frame];
+  if (self) {
+    self.shadowOffset = CGSizeMake(0, 0);
+    self.shadowOpacity = 0;
+    self.highlightColor = [UIColor clearColor];
+    self.highlightOpacity = 0;
   }
   return self;
 }

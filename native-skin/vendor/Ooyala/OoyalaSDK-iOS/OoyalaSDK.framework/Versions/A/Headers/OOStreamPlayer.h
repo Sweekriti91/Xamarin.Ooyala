@@ -8,26 +8,17 @@
 #import <UIKit/UIKit.h>
 
 #import "OOPlayer.h"
-#import "OOEnums.h"
-
-#ifndef OOStreamPlayer_h
-#define OOStreamPlayer_h
-
-@class OOOoyalaPlayer;
-@protocol OOPlayerInfo;
+#import "OOPlayerInfo.h"
 
 @interface OOStreamPlayer : OOPlayer {
   @protected
   OOSeekStyle _seekStyle;
 }
-
 @property (nonatomic, readonly) OOSeekStyle seekStyle;
-@property (readonly, nonatomic, getter=isPiPActivated) BOOL pipActivated;
++ (id<OOPlayerInfo>) defaultPlayerInfo;
++ (void) setDefaultPlayerInfo:(id<OOPlayerInfo>) playerInfo;
 
-+ (id<OOPlayerInfo>)defaultPlayerInfo;
-+ (void)setDefaultPlayerInfo:(id<OOPlayerInfo>)playerInfo;
-
-- (BOOL)setup:(NSArray *)streams parent:(OOOoyalaPlayer *)parent;
+- (BOOL)setup:(NSArray *)streams parent:(OOOoyalaPlayer*)parent;
 - (id<OOPlayerInfo>)playerInfo;
 
 /**
@@ -35,7 +26,7 @@
  * @param[in] time to seek
  * @param[in] onCompletion a callback when seek is completed
  */
-- (void)seekToTime:(Float64)time completion:(void (^)(void))onCompletion;
+- (void)seekToTime:(Float64)time completion:(void (^)())onCompletion;
 
 /**
  * toggle picture in picture mode
@@ -48,5 +39,3 @@
 - (void)disablePlaylistClosedCaptions;
 
 @end
-
-#endif /* OOStreamPlayer_h */

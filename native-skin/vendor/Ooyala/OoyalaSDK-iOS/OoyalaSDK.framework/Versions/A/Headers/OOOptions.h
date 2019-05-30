@@ -4,7 +4,6 @@
 @class OOFCCTVRatingConfiguration;
 @class OOIQConfiguration;
 @protocol AVPictureInPictureControllerDelegate;
-@protocol OOPlayerInfo;
 
 /**
  * Configurations to change the behavior of the OoyalaPlayer
@@ -62,12 +61,6 @@
  * Bypass the check to ensure the provided PCode matches the asset's Pcode
  */
 @property (nonatomic) BOOL bypassPCodeMatching;
-
-/**
- * The PlayerInfo used when making network requests to the Ooyala servers
- */
-@property (nonatomic) id<OOPlayerInfo> playerInfo;
-
 /**
  * Disable the support of VAST and Ooyala Ads that is enabled in the SDK by default
  */
@@ -82,21 +75,15 @@
 @property (nonatomic, getter=isHEVCEnabled) BOOL HEVCEnabled;
 
 /**
- * The initial playback speed rate. Default 1.0.
- * @warning: Not working for live, Ad's and VR assets.
- */
-@property (nonatomic) Float64 initialPlaybackSpeedRate;
-
-/**
  * Initialize an OOOptions object with the all properties with default values
  * @returns the initialized OOOptions
  */
-- (instancetype)init;
+-(instancetype) init;
 
 /**
  * Logs all properties that are part of this OOOptions.
  *
  */
-- (void)logProperties;
+-(void) logProperties;
 
 @end

@@ -13,25 +13,27 @@ import {
   Image,
   TouchableHighlight,
   View,
-  Platform,
   LayoutAnimation,
   NativeModules
 } from 'react-native';
 
 const AndroidAccessibility = NativeModules.AndroidAccessibility;
 
-import {
+var Constants = require('./constants');
+var {
   BUTTON_NAMES,
   ACCESSIBILITY_ANNOUNCERS,
+  IMG_URLS,
   UI_SIZES
-} from './constants';
-
-import CollapsingBarUtils from './collapsingBarUtils';
+} = Constants;
 
 var Log = require('./log');
 var Utils = require('./utils');
 var ControlBarWidget = require('./widgets/controlBarWidgets');
+var CollapsingBarUtils = require('./collapsingBarUtils');
+var VolumeView = require('./widgets/VolumeView');
 var ResponsiveDesignManager = require('./responsiveDesignManager');
+
 var styles = Utils.getStyles(require('./style/controlBarStyles.json'));
 
 class ControlBar extends React.Component {
@@ -47,10 +49,11 @@ class ControlBar extends React.Component {
     handleControlsTouch: PropTypes.func.isRequired,
     live: PropTypes.object,
     config: PropTypes.object.isRequired,
+    сlosedCaptionsEnabled: PropTypes.bool,
     stereoSupported: PropTypes.bool,
+    multiAudioEnabled: PropTypes.bool,
     showMoreOptionsButton: PropTypes.bool,
-    showAudioAndCCButton: PropTypes.bool,
-    showPlaybackSpeedButton: PropTypes.bool
+    showAudioAndCCButton: PropTypes.bool
   };
 
   static defaultProps = {playhead: 0, duration: 0};
@@ -75,10 +78,6 @@ class ControlBar extends React.Component {
     }
   };
 
-  getSelectedPlaybackSpeedRate = () => {
-    return Utils.formattedPlaybackSpeedRate(this.props.config.selectedPlaybackSpeedRate);
-  };
-
   getVolumeControlColor = () => {
     if (!this.props.config.general.accentColor) {
       if (!this.props.config.controlBar.volumeControl.color) {
@@ -86,7 +85,7 @@ class ControlBar extends React.Component {
         return '#4389FF';
       } else {
         return this.props.config.controlBar.volumeControl.color;
-      }
+      } 
     } else {
       return this.props.config.general.accentColor;
     }
@@ -109,8 +108,8 @@ class ControlBar extends React.Component {
   };
 
   onFullscreenPress = () => {
-    if (Platform.OS === 'android') {
-      AndroidAccessibility.announce(ACCESSIBILITY_ANNOUNCERS.SCREEN_MODE_CHANGED);
+    if(this.props.platform === Constants.PLATFORMS.ANDROID) {
+        AndroidAccessibility.announce(ACCESSIBILITY_ANNOUNCERS.SCREEN_MODE_CHANGED);
     }
     this.props.onPress && this.props.onPress(BUTTON_NAMES.FULLSCREEN);
   };
@@ -131,18 +130,17 @@ class ControlBar extends React.Component {
     this.props.onPress && this.props.onPress(BUTTON_NAMES.AUDIO_AND_CC);
   };
 
-  onPlaybackSpeedPress = () => {
-    this.props.onPress && this.props.onPress(BUTTON_NAMES.PLAYBACK_SPEED);
-  };
-
   render() {
-    let iconFontSize = ResponsiveDesignManager.makeResponsiveMultiplier(this.props.width, UI_SIZES.CONTROLBAR_ICONSIZE);
-    let labelFontSize = ResponsiveDesignManager.makeResponsiveMultiplier(this.props.width, UI_SIZES.CONTROLBAR_LABELSIZE);
-    let waterMarkName = Platform.select({
-      ios: this.props.config.controlBar.logo.imageResource.iosResource,
-      android: this.props.config.controlBar.logo.imageResource.androidResource
-    });
 
+    var iconFontSize = ResponsiveDesignManager.makeResponsiveMultiplier(this.props.width, UI_SIZES.CONTROLBAR_ICONSIZE);
+    var labelFontSize = ResponsiveDesignManager.makeResponsiveMultiplier(this.props.width, UI_SIZES.CONTROLBAR_LABELSIZE);
+    var waterMarkName;
+    if(this.props.platform == Constants.PLATFORMS.ANDROID) {
+      waterMarkName = this.props.config.controlBar.logo.imageResource.androidResource;
+    }
+    if(this.props.platform == Constants.PLATFORMS.IOS) {
+      waterMarkName = this.props.config.controlBar.logo.imageResource.iosResource;
+    }
     var controlBarWidgets = [];
 
     var widgetOptions = {
@@ -164,6 +162,7 @@ class ControlBar extends React.Component {
         volume: this.props.volume,
         scrubberStyle: styles.volumeSlider,
         volumeControlColor: this.getVolumeControlColor(),
+        platform: this.props.platform
       },
       timeDuration: {
         onPress: this.props.live ? this.props.live.onGoLive : null,
@@ -210,7 +209,7 @@ class ControlBar extends React.Component {
         shouldShow: Utils.shouldShowLandscape(this.props.width, this.props.height),
         style: styles.waterMarkImage,
         icon:waterMarkName,
-        resizeMode: "contain"
+        resizeMode: Image.resizeMode.contain
       },
       stereoscopic: {
         onPress: this.onStereoscopicPress,
@@ -225,65 +224,36 @@ class ControlBar extends React.Component {
         icon: this.props.config.icons.audioAndCC,
         enabled: this.props.showAudioAndCCButton
       },
-      playbackSpeed: {
-        onPress: this.onPlaybackSpeedPress,
-        iconTouchableStyle: styles.iconTouchable,
-        style: [styles.icon, {"fontSize": labelFontSize}, this.props.config.controlBar.iconStyle.active],
-        selectedPlaybackSpeedRate: this.getSelectedPlaybackSpeedRate(),
-        enabled: this.props.showPlaybackSpeedButton
-      },
     };
 
-    function _isVisible( item ) {
-      let visible = true;
-      switch (item.name) {
-        case BUTTON_NAMES.MORE:
-          visible = this.props.showMoreOptionsButton;
-          break;
-        case BUTTON_NAMES.AUDIO_AND_CC:
-          visible = this.props.showAudioAndCCButton;
-          break;
-        case BUTTON_NAMES.PLAYBACK_SPEED:
-          visible = this.props.showPlaybackSpeedButton;
-          break;
-        case BUTTON_NAMES.STEREOSCOPIC:
-          visible = this.props.stereoSupported;
-          break;
-        default:
-          visible = Object.keys(widgetOptions).includes(item.name);
-      }
-      item.isVisible = visible;
-    }
-
-    this.props.config.buttons.forEach(_isVisible, this);
-    //Log.warn("collapse isVisible Results:"+JSON.stringify(this.props.config.buttons));
-
-    const itemCollapsingResults = CollapsingBarUtils.collapse(this.props.width, this.props.config.buttons);
+    var itemCollapsingResults = CollapsingBarUtils.collapse( this.props.width, this.props.config.buttons );
+    // Log.verbose(itemCollapsingResults);  even more than verbose.  see what is being placed in the control bar
 
     function pushControl(item) {
       controlBarWidgets.push(item)
     }
 
     for (var i = 0; i < itemCollapsingResults.fit.length; i++) {
-      const widget = itemCollapsingResults.fit[i];
-      const item = <ControlBarWidget
+      let widget = itemCollapsingResults.fit[i];
+
+      let item = <ControlBarWidget
         key={i}
         widgetType={widget}
         options={widgetOptions}/>;
 
       if (widget.name === BUTTON_NAMES.STEREOSCOPIC) {
-        if (this.props.stereoSupported) {
+        if (this.props.stereoSupported){
           pushControl(item);
         }
-      } else if (widget.name === BUTTON_NAMES.AUDIO_AND_CC) {
-        if (this.props.showAudioAndCCButton) {
+      } else if (widget.name === BUTTON_NAMES.AUDIO_AND_CC)  {
+        if (this.props.multiAudioEnabled || this.props.сlosedCaptionsEnabled) {
           pushControl(item);
         }
       } else {
         pushControl(item);
       }
     }
-    const widthStyle = {width:this.props.width};
+    var widthStyle = {width:this.props.width};
     return (
       <View style={[styles.controlBarContainer, widthStyle]} onTouchEnd={this.props.handleControlsTouch}>
         {controlBarWidgets}

@@ -76,10 +76,11 @@ namespace Sample.OoyalaSDK.Droid
             var options = new Options.Builder().SetUseExoPlayer(true).Build();
             OoyalaPlayerLayout ooyalaPlayerLayout = FindViewById<OoyalaPlayerLayout>(Resource.Id.ooyalaPlayer);
             _player = new OoyalaPlayer(_pcode, playerDomain, options);
-            var controller = new OoyalaPlayerLayoutController(ooyalaPlayerLayout, _player);
+            OoyalaPlayerLayoutController playerLayoutController = new OoyalaPlayerLayoutController(ooyalaPlayerLayout, _player);
             _castManager.RegisterWithOoyalaPlayer(_player);
             _player.AddObserver(this);
             Play(_embedCode);
+
         }
 
         private void Play(string code)

@@ -1,12 +1,5 @@
-const CONTENT_TYPES = {
-  CHANNEL_SET: 'MultiChannel',
-  CHANNEL: 'Channel',
-  VIDEO: 'Video',
-  LIVE_STREAM: 'LiveStream',
-  AUDIO: 'Audio'
-};
 
-const UI_SIZES = {
+UI_SIZES = {
   VIDEOVIEW_PLAYPAUSE: 60,
   CONTROLBAR_HEIGHT: 75,
   VIDEOWATERMARK: 30,
@@ -19,7 +12,7 @@ const UI_SIZES = {
 const BUTTON_NAMES = { // must match Objective-C code expectations & skin.json.
   PLAY: 'Play',
   PLAY_PAUSE: 'PlayPause',
-  FULLSCREEN: 'fullscreen',
+  FULLSCREEN: 'Fullscreen',
   MORE: 'moreOptions',
   DISMISS: 'dismiss',
   VOLUME: 'volume',
@@ -33,8 +26,7 @@ const BUTTON_NAMES = { // must match Objective-C code expectations & skin.json.
   // more option buttons
   DISCOVERY: 'discovery',
   QUALITY: 'quality',
-  AUDIO_AND_CC: 'audioAndCC',
-  PLAYBACK_SPEED: 'playbackSpeed',
+  AUDIO_AND_CC: 'Audio and closed captions',
   SHARE: 'share',
   SETTING: 'settings',
   STEREOSCOPIC: 'stereoscopic',
@@ -46,17 +38,21 @@ const BUTTON_NAMES = { // must match Objective-C code expectations & skin.json.
   AD_OVERLAY: 'Overlay',
   PIP: 'PIP',
   UP_NEXT: 'Select up next',
-  CLOSED_CAPTIONS: 'closedCaption',
-  MORE_DETAILS: 'moreDetails'
 };
 
 const VIEW_NAMES = {
+
   // Time seek bar views
   TIME_SEEK_BAR: 'seekBar',
   TIME_SEEK_BAR_THUMB: 'seekBar_thumb',
   TIME_SEEK_BAR_PLAYED: 'seekBar_played',
   TIME_SEEK_BAR_BACKGROUND: 'seekBar_background',
   TIME_SEEK_BAR_BUFFERED: 'seekBar_buffered'
+};
+
+const PLATFORMS = {
+  ANDROID:'android',
+  IOS: 'ios',
 };
 
 const IMG_URLS = {
@@ -70,24 +66,23 @@ const IMG_URLS = {
 const SCREEN_TYPES = {
   LOADING_SCREEN: 'loading',
   VIDEO_SCREEN: 'video',
-  AUDIO_SCREEN: 'audio',
   START_SCREEN: 'start',
   DISCOVERY_END_SCREEN: 'discovery_end',
   END_SCREEN: 'end',
   PAUSE_SCREEN: 'pause',
   AD_SCREEN: 'ad',
   ERROR_SCREEN: 'error',
-  ERROR_SCREEN_AUDIO: 'error_audio',
 };
 
 const OVERLAY_TYPES = {
   DISCOVERY_SCREEN: 'discovery_screen',
   MOREOPTION_SCREEN: 'moreOption',
   AUDIO_AND_CC_SCREEN: 'audioAndCCScreen',
-  PLAYBACK_SPEED_SCREEN: 'playbackSpeedScreen',
-  VOLUME_SCREEN: 'volumeScreen',
-  MORE_DETAILS: 'moreDetails'
 }
+
+const OOSTATES = {
+  PAUSED: 'paused',
+};
 
 const DESIRED_STATES = {
   DESIRED_PAUSE: 'desired_pause',
@@ -112,9 +107,7 @@ const VALUES = {
   SEEK_VALUE: 10,
   MAX_SKIP_VALUE: 99,
   MIN_SKIP_VALUE: 1,
-  MAX_PROGRESS_PERCENT: 100,
   LIVE_THRESHOLD: 0.95,
-  LIVE_AUDIO_THRESHOLD: 0.99,
   DELAY_BETWEEN_SKIPS_MS: 300
 };
 
@@ -130,8 +123,7 @@ const ERROR_MESSAGE = {
 
 const CELL_TYPES = {
   MULTI_AUDIO: 'multi_audio',
-  SUBTITLES: "subtitles",
-  PLAYBACK_SPEED_RATE: "playback_speed_rate"
+  SUBTITLES: "subtitles"
 };
 
 const VIEW_ACCESSIBILITY_NAMES = {
@@ -139,16 +131,13 @@ const VIEW_ACCESSIBILITY_NAMES = {
   VOLUME_VIEW: 'Volume view',
   MULTI_AUDIO_CELL: 'Language cell. Tap twice to choose this audio track',
   CC_CELL: 'Subtitle cell. Tap twice to choose this subtitles',
-  PLAYBACK_SPEED_CELL: "Playback speed cell. Tap twice to choose this playback speed rate",
-  PROGRESS_BAR: 'Progress bar. ',
-  PROGRESS_BAR_ANDROID_SPECIFIC: ' %.  Use two fingers to adjust the progress value',
+  PROGRESS_BAR: 'Progress bar. Use two fingers to adjust the progress value',
   VOLUME_BAR: 'Volume bar. Use two fingers to adjust the volume value',
   FORWARD_BUTTON: 'Forward button. Tap twice to seek forward',
   BACKWARD_BUTTON: 'Backward button. Tap twice to seek backward',
   ENTER_FULLSCREEN: 'Enter Fullscreen mode button selected. Double tap to activate.',
   EXIT_FULLSCREEN: 'Exit Fullscreen mode button selected. Double tap to activate.',
   PLAY_PAUSE_BUTTON: "button. Tap twice to",
-  PLAYBACK_SPEED_BUTTON: "Playback speed",
 };
 
 const ACCESSIBILITY_ANNOUNCERS = {
@@ -162,22 +151,18 @@ const ANNOUNCER_TYPES = {
   MOVED: 'moved'
 };
 
-const ACCESSIBILITY_COMMON = {
-  SELECTED: 'selected'
-};
-
-const MAX_DATE_VALUE = 8640000000000000;
-const AUTOHIDE_DELAY = 5000;
-
-export {
-  CONTENT_TYPES,
+MAX_DATE_VALUE = 8640000000000000;
+AUTOHIDE_DELAY = 5000;
+module.exports = {
   UI_SIZES,
   BUTTON_NAMES,
   VIEW_NAMES,
   IMG_URLS,
   SCREEN_TYPES,
   OVERLAY_TYPES,
+  OOSTATES,
   LOG_LEVEL,
+  PLATFORMS,
   MAX_DATE_VALUE,
   AUTOHIDE_DELAY,
   DESIRED_STATES,
@@ -189,5 +174,4 @@ export {
   VIEW_ACCESSIBILITY_NAMES,
   ACCESSIBILITY_ANNOUNCERS,
   ANNOUNCER_TYPES,
-  ACCESSIBILITY_COMMON
 };

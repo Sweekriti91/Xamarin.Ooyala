@@ -15,7 +15,6 @@ import com.ooyala.android.OoyalaPlayer;
 import com.ooyala.android.SeekInfo;
 import com.ooyala.android.captions.ClosedCaptionsStyle;
 import com.ooyala.android.item.Video;
-import com.ooyala.android.playback.PlaybackNotificationInfo;
 import com.ooyala.android.player.exoplayer.multiaudio.AudioTrack;
 import com.ooyala.android.util.DebugMode;
 
@@ -26,7 +25,7 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.Set;
 
-public class BridgeMessageBuilder {
+class BridgeMessageBuilder {
   private static final String TAG = BridgeMessageBuilder.class.getSimpleName();
 
   public static WritableMap buildTimeChangedEvent(OoyalaPlayer player) {
@@ -76,7 +75,7 @@ public class BridgeMessageBuilder {
     return params;
   }
 
-  public static WritableMap buildCurrentItemChangedParams(OoyalaPlayer player, int width, int height, float currentVolume) {
+  public static WritableMap buildCurrentItemChangedParams(OoyalaPlayer player, int width, int height, int currentVolume) {
     WritableMap params = Arguments.createMap();
 
     Video currentItem = player.getCurrentItem();
@@ -97,7 +96,7 @@ public class BridgeMessageBuilder {
       params.putBoolean("live", currentItem.isLive());
       params.putInt("width", width);
       params.putInt("height", height);
-      params.putDouble("volume", currentVolume);
+      params.putInt("volume", currentVolume);
       if (currentItem.hasClosedCaptions()) {
         WritableArray languages = Arguments.createArray();
         for (String s : currentItem.getClosedCaptions().getLanguagesNames()) {
@@ -351,25 +350,6 @@ public class BridgeMessageBuilder {
     if (userInfo != null) {
       int code = userInfo.optInt("code");
       params.putInt("code", code);
-    }
-    return params;
-  }
-
-  public static WritableMap buildPlaybackEnabledParams(Object data) {
-    WritableMap params = Arguments.createMap();
-    if (data != null) {
-      PlaybackNotificationInfo info = (PlaybackNotificationInfo) data;
-      params.putBoolean("playbackSpeedEnabled", info.isPlaybackSpeedEnabled());
-      params.putDouble("selectedPlaybackSpeedRate", info.getSpeed());
-    }
-    return params;
-  }
-
-  public static WritableMap buildPlaybackRateChangedParams(Object data) {
-    WritableMap params = Arguments.createMap();
-    if (data != null) {
-      PlaybackNotificationInfo info = (PlaybackNotificationInfo) data;
-      params.putDouble("selectedPlaybackSpeedRate", info.getSpeed());
     }
     return params;
   }

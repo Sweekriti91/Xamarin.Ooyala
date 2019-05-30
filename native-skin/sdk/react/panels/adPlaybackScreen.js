@@ -1,32 +1,48 @@
 'use strict';
 
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ */
 import PropTypes from 'prop-types';
 
 import React, { Component } from 'react';
 import {
   Image,
+  Text,
   View,
+  StyleSheet,
   TouchableHighlight
 } from 'react-native';
 
-import {
+var Dimensions = require('Dimensions');
+var windowSize = Dimensions.get('window');
+var BottomOverlay = require('../bottomOverlay');
+var AdBar = require('../adBar');
+var UpNext = require('../upNext');
+var RectButton = require('../widgets/RectButton');
+var VideoViewPlayPause = require('../widgets/VideoViewPlayPause');
+var Constants = require('../constants');
+var Log = require('../log');
+var Utils = require('../utils');
+var styles = Utils.getStyles(require('./style/videoViewStyles.json'));
+var ResponsiveDesignManager = require('../responsiveDesignManager');
+var VideoWaterMark = require('../widgets/videoWaterMark');
+var autohideDelay = 5000;
+
+var {
+  BUTTON_NAMES,
+  PLATFORMS,
+  IMG_URLS,
   UI_SIZES,
   AUTOHIDE_DELAY,
   VALUES
-} from '../constants';
-
-import Log from '../log';
-
-const BottomOverlay = require('../bottomOverlay');
-const AdBar = require('../adBar');
-const VideoViewPlayPause = require('../widgets/VideoViewPlayPause');
-const Utils = require('../utils');
-const styles = Utils.getStyles(require('./style/videoViewStyles.json'));
-const ResponsiveDesignManager = require('../responsiveDesignManager');
+} = Constants;
 
 class AdPlaybackScreen extends React.Component {
   static propTypes = {
     rate: PropTypes.number,
+    platform: PropTypes.string,
     playhead: PropTypes.number,
     buffered: PropTypes.number,
     duration: PropTypes.number,
@@ -57,35 +73,39 @@ class AdPlaybackScreen extends React.Component {
     initialPlay: PropTypes.bool,
   };
 
+  static defaultProps = {playhead: 0, buffered: 0, duration: 1};
+
   state = {
-    showControls:true,
   };
 
-  static defaultProps = {playhead: 0, buffered: 0, duration: 1};
+  componentWillReceiveProps(nextProps) {
+
+  }
 
   generateLiveObject = () => {
     if (this.props.live) {
-      const isLive = this.props.playhead >= this.props.duration * VALUES.LIVE_THRESHOLD;
+      var isLive = this.props.playhead >= this.props.duration * VALUES.LIVE_THRESHOLD;
       return ({
         label:
-          isLive ? Utils.localizedString(this.props.locale, 'LIVE', this.props.localizableStrings) :
-          Utils.localizedString(this.props.locale, 'GO LIVE', this.props.localizableStrings),
+          isLive ? Utils.localizedString(this.props.locale, "LIVE", this.props.localizableStrings) :
+          Utils.localizedString(this.props.locale, "GO LIVE", this.props.localizableStrings),
         onGoLive: isLive? null : this.onGoLive});
+    } else {
+      return null;
     }
-    return null;
   };
 
   onGoLive = () => {
-    Log.log('onGoLive');
+    Log.log("onGoLive");
     if (this.props.handlers.onScrub) {
       this.props.handlers.onScrub(1);
     }
   };
 
   handlePress = (name) => {
-    Log.verbose('VideoView Handle Press: ' + name);
+    Log.verbose("VideoView Handle Press: " + name);
     if (this.state.showControls) {
-      if (name == 'LIVE') {
+      if (name == "LIVE") {
         this.props.handlers.onScrub(1);
       } else {
         this.props.handlers.onPress(name);
@@ -102,50 +122,45 @@ class AdPlaybackScreen extends React.Component {
   };
 
   _renderBottomOverlay = (show) => {
-    return (
-      <BottomOverlay
-        width={this.props.width}
-        height={this.props.height}
-        primaryButton={!this.props.playing ? 'play' : 'pause'}
-        fullscreen = {this.props.fullscreen}
-        cuePoints = {this.props.cuePoints}
-        playhead={this.props.playhead}
-        duration={this.props.duration}
-        ad={this.props.ad}
-        volume={this.props.volume}
-        live={this.generateLiveObject()}
-        onPress={(name) => this.handlePress(name)}
-        onScrub={(value)=>this.handleScrub(value)}
-        handleControlsTouch={() => this.props.handlers.handleControlsTouch()}
-        showClosedCaptionsButton={false}
-        showWatermark={this.props.showWatermark}
-        isShow={show}
-        config={{
-          controlBar: this.props.config.controlBar,
-          buttons: this.props.config.buttons,
-          icons: this.props.config.icons,
-          live: this.props.config.live,
-          general: this.props.config.general
-        }}
-        showMoreOptionsButton={false}
-        showAudioAndCCButton={false}
-        showPlaybackSpeedButton={false}>
-      </BottomOverlay>
-    );
+    return (<BottomOverlay
+      width={this.props.width}
+      height={this.props.height}
+      primaryButton={!this.props.playing ? "play" : "pause"}
+      fullscreen = {this.props.fullscreen}
+      cuePoints = {this.props.cuePoints}
+      playhead={this.props.playhead}
+      platform={this.props.platform}
+      duration={this.props.duration}
+      ad={this.props.ad}
+      volume={this.props.volume}
+      live={this.generateLiveObject()}
+      onPress={(name) => this.handlePress(name)}
+      onScrub={(value)=>this.handleScrub(value)}
+      handleControlsTouch={() => this.props.handlers.handleControlsTouch()}
+      showClosedCaptionsButton={false}
+      showWatermark={this.props.showWatermark}
+      isShow={show}
+      config={{
+        controlBar: this.props.config.controlBar,
+        buttons: this.props.config.buttons,
+        icons: this.props.config.icons,
+        live: this.props.config.live,
+        general: this.props.config.general
+      }}
+      showMoreOptionsButton={false}
+      showAudioAndCCButton={false} />);
   };
 
   _renderAdBar = () => {
-    return (
-      <AdBar
+    return (<AdBar
         ad={this.props.ad}
         playhead={this.props.playhead}
         duration={this.props.duration}
         onPress={this.handlePress}
         width={this.props.width}
         localizableStrings={this.props.localizableStrings}
-        locale={this.props.locale}>
-      </AdBar>
-    );
+        locale={this.props.locale} />
+      );
   };
 
   _renderPlaceholder = (adIcons) => {
@@ -154,46 +169,45 @@ class AdPlaybackScreen extends React.Component {
         style={styles.placeholder}
         onTouchEnd={(event) => this.props.handlers.handleVideoTouch(event)}>
         {adIcons}
-      </View>
-    );
+      </View>);
   };
 
   _renderPlayPause = (show) => {
-    const iconFontSize = ResponsiveDesignManager.makeResponsiveMultiplier(this.props.width, UI_SIZES.VIDEOVIEW_PLAYPAUSE);
-    return (
-      <VideoViewPlayPause
-        icons={{
-          play: {
-            icon: this.props.config.icons.play.fontString,
-            fontFamily: this.props.config.icons.play.fontFamilyName
-          },
-          pause: {
-            icon: this.props.config.icons.pause.fontString,
-            fontFamily: this.props.config.icons.pause.fontFamilyName
-          },
-          seekForward: {
-            icon: this.props.config.icons.forward.fontString,
-            fontFamily: this.props.config.icons.forward.fontFamilyName
-          },
-          seekBackward: {
-            icon: this.props.config.icons.replay.fontString,
-            fontFamily: this.props.config.icons.replay.fontFamilyName
-          }
-        }}
-        position={'center'}
-        onPress={(name) => this.handlePress(name)}
-        frameWidth={this.props.width}
-        frameHeight={this.props.height}
-        buttonWidth={iconFontSize}
-        buttonHeight={iconFontSize}
-        fontSize={iconFontSize}
-        showButton={show}
-        rate={this.props.rate}
-        playing={this.props.playing}
-        loading={this.props.loading}
-        initialPlay={this.props.initialPlay}>
-      </VideoViewPlayPause>
-    );
+    var iconFontSize = ResponsiveDesignManager.makeResponsiveMultiplier(this.props.width, UI_SIZES.VIDEOVIEW_PLAYPAUSE);
+      return (
+        <VideoViewPlayPause
+          icons={{
+            play: {
+              icon: this.props.config.icons.play.fontString,
+              fontFamily: this.props.config.icons.play.fontFamilyName
+            },
+            pause: {
+              icon: this.props.config.icons.pause.fontString,
+              fontFamily: this.props.config.icons.pause.fontFamilyName
+            },
+            seekForward: {
+              icon: this.props.config.icons.forward.fontString,
+              fontFamily: this.props.config.icons.forward.fontFamilyName
+            },
+            seekBackward: {
+              icon: this.props.config.icons.replay.fontString,
+              fontFamily: this.props.config.icons.replay.fontFamilyName
+            }
+          }}
+          position={"center"}
+          onPress={(name) => this.handlePress(name)}
+          frameWidth={this.props.width}
+          frameHeight={this.props.height}
+          buttonWidth={iconFontSize}
+          buttonHeight={iconFontSize}
+          platform={this.props.platform}
+          fontSize={iconFontSize}
+          showButton={show}
+          rate={this.props.rate}
+          playing={this.props.playing}
+          loading={this.props.loading}
+          initialPlay={this.props.initialPlay}>
+        </VideoViewPlayPause>);
   };
 
   handleScrub = (value) => {
@@ -205,30 +219,31 @@ class AdPlaybackScreen extends React.Component {
   };
 
   _renderAdIcons = () => {
-    let iconViews = [];
-    for (const index in this.props.ad.icons) {
-      const icon = this.props.ad.icons[index];
+    var iconViews = [];
+    for (var index in this.props.ad.icons) {
+      var icon = this.props.ad.icons[index];
       if ((this.props.playhead < icon.offset) || (this.props.playhead > (icon.offset + icon.duration))) {
         continue;
       }
-      const left = icon.x;
-      const top = icon.y;
-      const iconStyle = {position: 'absolute', width: icon.width, height: icon.height, backgroundColor: 'transparent'};
+      var left = icon.x;
+      var top = icon.y;
+      var iconStyle = {position:"absolute", width:icon.width, height:icon.height, backgroundColor:"transparent"};
 
-      const leftStyle = (left < this.props.width - icon.width) ? {left: icon.left} : {right: 0};
-      const topStyle = (top < this.props.height - icon.height) ? {top: icon.top} : {bottom: 0};
-      const clickHandler = this._createOnIcon(index, this.props.handlers.onIcon);
+      var leftStyle =
+        (left < this.props.width -  icon.width) ? {left:icon.left} : {right:0};
+      var topStyle =
+        (top < this.props.height - icon.height) ? {top:icon.top} : {bottom:0};
+      var clickHandler = this._createOnIcon(index, this.props.handlers.onIcon);
 
       iconViews.push(
         <TouchableHighlight
-          key={'iconTouchable' + index}
+          key={"iconTouchable"+index}
           style={[iconStyle, leftStyle, topStyle]}
           onPress={clickHandler}>
-            <Image
-              key={'iconImage' + index}
-              style={{flex: 1}}
-              source={{uri: icon.url}}>
-            </Image>
+          <Image
+            key={"iconImage" + index}
+            style={{flex:1}}
+            source={{uri: icon.url}} />
         </TouchableHighlight>
       );
     }
@@ -236,16 +251,16 @@ class AdPlaybackScreen extends React.Component {
   };
 
   render() {
-    const isPastAutoHideTime = (new Date).getTime() - this.props.lastPressedTime > AUTOHIDE_DELAY;
-    const doesAdRequireControls = this.props.ad && this.props.ad.requireControls;
+    var isPastAutoHideTime = (new Date).getTime() - this.props.lastPressedTime > AUTOHIDE_DELAY;
+    var doesAdRequireControls = this.props.ad && this.props.ad.requireControls;
     // TODO: IMA Ads UI is still not supported - No way to show UI while allowing Learn More in a clean way
     // var isAdPaused = this.props.ad && !this.props.playing;
-    const isContent = !this.props.ad;
-    const shouldShowControls = this.props.screenReaderEnabled ? true : !isPastAutoHideTime && (doesAdRequireControls || isContent);
+    var isContent = !this.props.ad;
 
-    let adBar;
-    let adIcons;
+    var shouldShowControls = this.props.screenReaderEnabled ? true : !isPastAutoHideTime && (doesAdRequireControls || isContent);
 
+    var adBar = null;
+    var adIcons = null;
     if (this.props.ad) {
       adBar = (this.props.ad.requireAdBar && this.props.config.adScreen.showAdMarquee) ? this._renderAdBar() : null;
       if (this.props.ad.icons) {
@@ -254,12 +269,14 @@ class AdPlaybackScreen extends React.Component {
     }
 
     if (!this.props.config.adScreen.showControlBar) {
-      let playButtonIfPaused;
+
+      var playButtonIfPaused;
       if (!this.props.playing) {
-        playButtonIfPaused = this._renderPlayPause(shouldShowControls)
+        playButtonIfPaused = this._renderPlayPause(this.props.screenReaderEnabled ? false : shouldShowControls)
       }
       return (
-        <View style={styles.adContainer}>
+        <View
+          style={styles.container}>
           {adBar}
           {this._renderPlaceholder(adIcons)}
           {playButtonIfPaused}
@@ -267,16 +284,16 @@ class AdPlaybackScreen extends React.Component {
       );
     } else {
       return (
-        <View style={styles.adContainer}>
+        <View
+          style={styles.container}>
           {adBar}
           {this._renderPlaceholder(adIcons)}
-          {this._renderPlayPause(shouldShowControls)}
-          {this._renderBottomOverlay(shouldShowControls)}
+          {this._renderPlayPause(this.props.screenReaderEnabled ? false : shouldShowControls) }
+          {this._renderBottomOverlay(shouldShowControls) }
         </View>
       );
     }
   }
-
 }
 
 module.exports = AdPlaybackScreen;

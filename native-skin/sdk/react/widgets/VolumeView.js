@@ -11,7 +11,7 @@ import {
 var iface = {
   name: 'VolumeView',
   propTypes: {
-    volume: PropTypes.object
+    volume: PropTypes.object,
   }
 };
 

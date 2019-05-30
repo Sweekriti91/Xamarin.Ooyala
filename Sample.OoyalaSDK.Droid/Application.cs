@@ -21,7 +21,7 @@ namespace Sample.OoyalaSDK.Droid
             base.OnCreate();
 
             RegisterActivityLifecycleCallbacks(this);
-            CastManager.Initialize(this, NameSpace);
+            CastManager.InitCastManager(this, NameSpace);
             _castManager = CastManager.GetCastManager();
         }
 

@@ -33,8 +33,8 @@
 }
 
 - (void)dismissPresentedViewControllersWithCompletionBlock:(void (^)(void))completion {
-  if (self.presentedViewController) {
-    [self dismissViewControllerAndStoreIt:self.presentedViewController withCompletionBlock:completion];
+  if (_presentedViewController != nil) {
+    [self dismissViewControllerAndStoreIt:_presentedViewController withCompletionBlock:completion];
   } else {
     if (completion) {
       completion();
@@ -43,10 +43,8 @@
 }
 
 - (void)presentStoredControllersWithCompletionBlock:(void (^)(void))completion {
-  if (self.storedPresentedViewControllers.count > 0) {
-    [self presentViewController:self.storedPresentedViewControllers.firstObject
-               onViewController:self.rootViewController
-            withCompletionBlock:completion];
+  if ([_storedPresentedViewControllers count] > 0) {
+    [self presentViewController:self.storedPresentedViewControllers.firstObject onViewController:_rootViewController withCompletionBlock:completion];
   } else {
     if (completion) {
       completion();
@@ -71,8 +69,8 @@
     return [self findPresentedViewController:[(UITabBarController *)startedViewController selectedViewController]];
   }
   
-  if (!startedViewController.presentedViewController || startedViewController.presentedViewController.isBeingDismissed) {
-    if (startedViewController.presentingViewController) {
+  if (startedViewController.presentedViewController == nil || startedViewController.presentedViewController.isBeingDismissed) {
+    if (startedViewController.presentingViewController != nil) {
       return startedViewController;
     } else {
       return nil;
@@ -85,7 +83,7 @@
 - (void)dismissViewControllerAndStoreIt:(nonnull UIViewController *)viewController
                     withCompletionBlock:(nullable void (^)(void))completion {
   if ([viewController presentingViewController]) {
-    UIViewController* presentedVC = viewController.presentedViewController;
+    UIViewController* presentedVC = [viewController presentedViewController];
     [viewController dismissViewControllerAnimated:NO completion:^{
       [self.storedPresentedViewControllers addObject:viewController];
       if ([presentedVC presentingViewController]) {
@@ -104,10 +102,8 @@
           withCompletionBlock:(nullable void (^)(void))completion {
   [baseViewController presentViewController:viewControllerToPresent animated:NO completion:^{
     [self.storedPresentedViewControllers removeObject:viewControllerToPresent];
-    if (self.storedPresentedViewControllers.count > 0) {
-      [self presentViewController:self.storedPresentedViewControllers.firstObject
-                 onViewController:viewControllerToPresent
-              withCompletionBlock:completion];
+    if ([self.storedPresentedViewControllers count] > 0) {
+      [self presentViewController:self.storedPresentedViewControllers.firstObject onViewController:viewControllerToPresent withCompletionBlock:completion];
     } else {
       if (completion) {
         completion();

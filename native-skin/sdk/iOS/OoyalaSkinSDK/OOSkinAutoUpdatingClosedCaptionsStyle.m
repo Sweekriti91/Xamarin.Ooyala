@@ -9,29 +9,31 @@
 #import "OOSkinAutoUpdatingClosedCaptionsStyle.h"
 #import <OoyalaSDK/OOClosedCaptionsView.h>
 
-@interface OOSkinAutoUpdatingClosedCaptionsStyle ()
-
+@interface OOSkinAutoUpdatingClosedCaptionsStyle()
 @property (nonatomic, weak) OOClosedCaptionsView *ccView; // so we can tell it to update its rendering.
-
 @end
-
 
 @implementation OOSkinAutoUpdatingClosedCaptionsStyle
 
-- (instancetype)initWithClosedCaptionsView:(OOClosedCaptionsView*)ccView {
-  if (self = [super init]) {
+-(id) initWithClosedCaptionsView:(OOClosedCaptionsView*)ccView {
+  self = [super init];
+  if( self ) {
     _ccView = ccView;
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(onApplicationDidBecomeActive:)
-                                               name:UIApplicationDidBecomeActiveNotification
-                                             object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onApplicationDidBecomeActive:)
+                                                 name:UIApplicationDidBecomeActiveNotification
+                                               object:nil];
   }
   return self;
 }
 
-- (void)onApplicationDidBecomeActive:(NSNotification *)notification {
+-(void) dealloc {
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+-(void) onApplicationDidBecomeActive:(NSNotification *)notification {
   [self updateStyle];
-  self.ccView.style = self; // without this, the ccView never changes its rendering.
+  [self.ccView setStyle:self]; // without this, the ccView never changes its rendering.
 }
 
 @end

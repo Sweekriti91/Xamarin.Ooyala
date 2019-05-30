@@ -8,14 +8,16 @@ import {
   View,
 } from 'react-native';
 
-import {
+var ResponsiveDesignManager = require('../responsiveDesignManager');
+var Constants = require('../constants');
+var styles = require('../utils').getStyles(require('./style/videoWaterMarkStyles.json'));
+var {
   BUTTON_NAMES,
   IMG_URLS,
   UI_SIZES
-} from '../constants';
+} = Constants;
 
-var ResponsiveDesignManager = require('../responsiveDesignManager');
-var styles = require('../utils').getStyles(require('./style/videoWaterMarkStyles.json'));
+
 
 class logo extends React.Component {
   static propTypes = {
@@ -32,7 +34,7 @@ class logo extends React.Component {
             <Image
               style={sizeStyle}
               source={{uri: waterMarkName}}
-              resizeMode="contain"/>
+              resizeMode={Image.resizeMode.contain}/>
           </View>
         );
     };

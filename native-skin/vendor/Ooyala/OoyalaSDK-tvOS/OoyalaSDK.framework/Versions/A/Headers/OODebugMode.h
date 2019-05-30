@@ -25,6 +25,7 @@ typedef NS_ENUM(NSInteger, DebugMode) {
 /**
  * sets the debug mode.
  * @param[in] mode the debug mode to be set
+ * @returns YES if nil, NULL, or empty, NO if not
  */
 + (void)setDebugMode:(DebugMode)mode;
 
@@ -38,14 +39,14 @@ typedef NS_ENUM(NSInteger, DebugMode) {
 
 /**
  * helper function to assert a false condition
- * @param[in] tag the tag
+ * @param[in] tag
  * @param[in] format of the message
  */
 + (void)assertFalse:(NSString *)tag message:(NSString *)format, ...;
 
 /**
  * log if the debug mode is not none, ignore otherwise
- * @param[in] tag the tag
+ * @param[in] tag: the tag
  * @param[in] format of the message
  */
 + (void)log:(NSString *)tag message:(NSString *)format, ...;

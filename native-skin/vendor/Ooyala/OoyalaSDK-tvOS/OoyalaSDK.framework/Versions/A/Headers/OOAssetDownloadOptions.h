@@ -6,13 +6,13 @@
 //  Copyright © 2016 Ooyala, Inc. All rights reserved.
 
 #import <Foundation/Foundation.h>
+#import "OOEmbedTokenGenerator.h"
+#import "OOAssetLoaderDelegate.h"
 
 @class OOPlayerDomain;
-@class OOAssetLoaderDelegate;
-@protocol OOEmbedTokenGenerator;
 
 /**
- Options object used to create an OODtoAsset.
+ Options object used to create an OOAssetDownloadManager.
  
  Here is an example on how to instantiate this class:
  @code
@@ -25,7 +25,7 @@
  downloadOptions.minimumBitrate = @(10000);
  @endcode
 
- You can then use the OOAssetDownloadOptions instance to create an OODtoAsset instance.
+ You can then use the OOAssetDownloadOptions instance to create an OOAssetDownloadManager instance.
  
  \ingroup offline
  */
@@ -34,22 +34,22 @@
 /**
  The Ooyala's account provider code
  */
-@property (nonatomic, nonnull) NSString *pcode;
+@property (nonatomic) NSString *pcode;
 
 /**
  Ooyala's video embed code (asset id)
  */
-@property (nonatomic, nonnull) NSString *embedCode;
+@property (nonatomic) NSString *embedCode;
 
 /**
  Ooyala's whitelist domain, for example: "http://www.ooyala.com/"
  */
-@property (nonatomic, nonnull) OOPlayerDomain *domain;
+@property (nonatomic) OOPlayerDomain *domain;
 
 /**
  Generates an embed token used for OPT (Ooyala Player Token), entitlements, and DRM assets
  */
-@property (nonatomic, nullable) id<OOEmbedTokenGenerator> embedTokenGenerator;
+@property (nonatomic, weak) id<OOEmbedTokenGenerator> embedTokenGenerator;
 
 /**
  How long to wait, in seconds, for the authorization requests previous to downloading an asset.
@@ -63,7 +63,7 @@
  Value should be a NSNumber in bps. If no suitable media bitrate is found, the highest media bitrate will be selected. 
  A negative number or 0, will default to the highest media bitrate.
  */
-@property (nonatomic, nullable) NSNumber *minimumBitrate;
+@property (nonatomic) NSNumber *minimumBitrate;
 
 /**
  When this property is enabled users will be able to download an asset using cellular data, e.g. 4G, LTE, 3G.
@@ -78,7 +78,7 @@
  Note : This only for special purposes. It's NOT recommend to use this property.
         When this property is in use, you CAN NOT use FairPlay.
  */
-@property (nonatomic, nullable) OOAssetLoaderDelegate *assetLoaderDelegate;
+@property (nonatomic) OOAssetLoaderDelegate *assetLoaderDelegate;
 
 /**
  This property can be used to set a fake URL scheme. For example, it changes "http" or "https" TO "fakeScheme" in the
@@ -86,6 +86,6 @@
  OOAssetDownloadOptions.
  Note: This is only for special purposes. It's not recommended to use this property.
  */
-@property (nonatomic, nullable) NSString *fakeURLScheme;
+@property (nonatomic) NSString *fakeURLScheme;
 
 @end

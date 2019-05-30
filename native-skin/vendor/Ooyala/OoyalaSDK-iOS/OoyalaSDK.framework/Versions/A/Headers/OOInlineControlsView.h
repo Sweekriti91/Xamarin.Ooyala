@@ -22,6 +22,5 @@
 @property (nonatomic, weak) id<OOTimeSliderDelegate> timeSliderDelegate;
 
 @property (nonatomic) CGRect bottomBarFrame;
-@property (nonatomic) BOOL isPiPActive;
 
 @end

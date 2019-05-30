@@ -2,38 +2,44 @@
 //  OOCastPlayer.h
 //  OoyalaSDK
 //
-//  Copyright (c) 2014 Ooyala, Inc. All rights reserved.
+//  Copyright © 2014 Ooyala, Inc. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
 #import <GoogleCast/GoogleCast.h>
 #import <OoyalaSDK/OOPlayerProtocol.h>
-#import <OoyalaSDK/OOStateNotifier.h>
 
-
-@class OOCastManager, OOCastModeOptions, OOOoyalaPlayer;
+@class OOCastManager;
+@class OOCastModeOptions;
+@class OOOoyalaPlayer;
+@class OOStateNotifier;
 @protocol OOCastMiniControllerProtocol;
-
+@protocol OOCastManagerInternalProtocol;
 
 @interface OOCastPlayer : GCKCastChannel <OOPlayerProtocol>
 
-@property (nonatomic) OOStateNotifier *stateNotifier;
-@property (nonatomic) NSString *embedCode;
+@property (nullable, nonatomic) OOStateNotifier *stateNotifier;
+@property (nullable, nonatomic) NSString *embedCode;
 @property (nonatomic) Float64 playheadTime;
-@property (nonatomic) NSString *castItemTitle;
-@property (nonatomic) NSString *castItemDescription;
-@property (nonatomic) NSString *castItemPromoImg;
+@property (nonnull, nonatomic) NSString *castItemTitle;
+@property (nonnull, nonatomic) NSString *castItemDescription;
+@property (nonnull, nonatomic) NSString *castItemPromoImg;
 @property (nonatomic, readonly) BOOL isMiniControllerInteractionAvailable;
 
-- (instancetype)init __attribute__((unavailable("use initWithNamespace:deviceManager:castManager")));
-- (instancetype)initWithNamespace:(NSString *)appNamespace castSession:(GCKCastSession *)castSession castManager:(OOCastManager *)castManager;
+- (nonnull instancetype)init __attribute__((unavailable("use initWithNamespace:deviceManager:castManager")));
+- (nonnull instancetype)initWithNamespace:(nonnull NSString *)appNamespace
+                              castSession:(nullable GCKCastSession *)castSession
+                              castManager:(nullable id<OOCastManagerInternalProtocol>)castManager;
 
-- (void)initStateNotifier:(OOStateNotifier *)stateNotifier;
-- (void)registerWithOoyalaPlayer:(OOOoyalaPlayer*)ooyalaPlayer;
-- (void)updateMetadataFromOoyalaPlayer:(NSString *)castItemPromoImg castItemTitle:(NSString *)castItemTitle castItemDescription:(NSString *)castItemDescription;
-- (void)enterCastModeWithOptions:(OOCastModeOptions *)options embedToken:(NSString *)embedToken additionalInitParams:(NSDictionary *)params;
-- (void)registerMiniController:(id<OOCastMiniControllerProtocol>) miniController;
-- (void)deregisterMiniController:(id<OOCastMiniControllerProtocol>)miniController;
+- (void)initStateNotifier:(nullable OOStateNotifier *)stateNotifier;
+- (void)registerWithOoyalaPlayer:(nullable OOOoyalaPlayer *)ooyalaPlayer;
+- (void)updateMetadataCastItemPromoImg:(nullable NSString *)castItemPromoImg
+                         castItemTitle:(nullable NSString *)castItemTitle
+                   castItemDescription:(nullable NSString *)castItemDescription;
+- (void)enterCastModeWithOptions:(nonnull OOCastModeOptions *)options
+                      embedToken:(nonnull NSString *)embedToken
+            additionalInitParams:(nullable NSDictionary *)params;
+- (void)registerMiniController:(nullable id<OOCastMiniControllerProtocol>)miniController;
+- (void)deregisterMiniController:(nullable id<OOCastMiniControllerProtocol>)miniController;
 - (void)onExitCastMode;
 - (void)forceAssetRejoin;
 

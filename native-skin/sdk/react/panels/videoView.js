@@ -13,21 +13,13 @@ import {
   Text,
   View,
   StyleSheet,
-  Platform,
   TouchableHighlight
 } from 'react-native';
-
-import {
-  BUTTON_NAMES,
-  IMG_URLS,
-  UI_SIZES,
-  AUTOHIDE_DELAY,
-  VALUES
-} from '../constants';
 
 const BottomOverlay = require('../bottomOverlay');
 const UpNext = require('../upNext');
 const VideoViewPlayPause = require('../widgets/VideoViewPlayPause');
+const Constants = require('../constants');
 const Log = require('../log');
 const Utils = require('../utils');
 const styles = Utils.getStyles(require('./style/videoViewStyles.json'));
@@ -35,9 +27,19 @@ const ResponsiveDesignManager = require('../responsiveDesignManager');
 const VideoWaterMark = require('../widgets/videoWaterMark');
 const panelStyles = require('./style/panelStyles.json');
 
+const {
+  BUTTON_NAMES,
+  PLATFORMS,
+  IMG_URLS,
+  UI_SIZES,
+  AUTOHIDE_DELAY,
+  VALUES
+} = Constants;
+
 class VideoView extends React.Component {
   static propTypes = {
     rate: PropTypes.number,
+    platform: PropTypes.string,
     playhead: PropTypes.number,
     buffered: PropTypes.number,
     duration: PropTypes.number,
@@ -50,8 +52,6 @@ class VideoView extends React.Component {
     cuePoints: PropTypes.array,
     stereoSupported: PropTypes.bool,
     multiAudioEnabled: PropTypes.bool,
-    playbackSpeedEnabled: PropTypes.bool,
-    selectedPlaybackSpeedRate: PropTypes.string,
     handlers: PropTypes.shape({
       onPress: PropTypes.func,
       onAdOverlay: PropTypes.func,
@@ -154,7 +154,7 @@ class VideoView extends React.Component {
   };
 
   _renderBottomOverlay = (show) => {
-    const ccEnabled =
+    const ссEnabled =
       this.props.availableClosedCaptionsLanguages &&
       this.props.availableClosedCaptionsLanguages.length > 0;
 
@@ -165,25 +165,26 @@ class VideoView extends React.Component {
       fullscreen={this.props.fullscreen}
       cuePoints={this.props.cuePoints}
       playhead={this.props.playhead}
+      platform={this.props.platform}
       duration={this.props.duration}
       volume={this.props.volume}
       live={this.generateLiveObject()}
       onPress={(name) => this.handlePress(name)}
       onScrub={(value) => this.handleScrub(value)}
       handleControlsTouch={() => this.props.handlers.handleControlsTouch()}
-      showAudioAndCCButton={this.props.multiAudioEnabled || ccEnabled}
-      showPlaybackSpeedButton={this.props.playbackSpeedEnabled}
+      closedCaptionsEnabled={ссEnabled}
+      showAudioAndCCButton={this.props.multiAudioEnabled || ссEnabled}
       showWatermark={this.props.showWatermark}
       isShow={show}
       screenReaderEnabled={this.props.screenReaderEnabled}
       stereoSupported={this.props.stereoSupported}
+      multiAudioEnabled={this.props.multiAudioEnabled}
       config={{
         controlBar: this.props.config.controlBar,
         buttons: this.props.config.buttons,
         icons: this.props.config.icons,
         live: this.props.config.live,
-        general: this.props.config.general,
-        selectedPlaybackSpeedRate: this.props.selectedPlaybackSpeedRate
+        general: this.props.config.general
       }}
     />);
   };
@@ -204,12 +205,14 @@ class VideoView extends React.Component {
 
   _renderBottom = () => {
     const VideoWaterMarkSize = ResponsiveDesignManager.makeResponsiveMultiplier(UI_SIZES.VIDEOWATERMARK, UI_SIZES.VIDEOWATERMARK);
-    let waterMarkName = Platform.select({
-      ios: this.props.config.general.watermark.imageResource.iosResource,
-      android: this.props.config.general.watermark.imageResource.androidResource
-    });
+    let waterMarkName, watermark;
+    if (this.props.platform === Constants.PLATFORMS.ANDROID) {
+      waterMarkName = this.props.config.general.watermark.imageResource.androidResource;
+    }
+    if (this.props.platform === Constants.PLATFORMS.IOS) {
+      waterMarkName = this.props.config.general.watermark.imageResource.iosResource;
+    }
 
-    let watermark;
     if (waterMarkName) {
       watermark = this._renderVideoWaterMark(waterMarkName, VideoWaterMarkSize);
     }
@@ -217,29 +220,33 @@ class VideoView extends React.Component {
     return (
       <View
         style={{flexDirection: "row", justifyContent: "center", alignItems: "flex-end"}}>
+        {this._renderClosedCaptions(waterMarkName, VideoWaterMarkSize)}
         {watermark}
-        {this._renderClosedCaptions()}
       </View>);
   };
 
-  _renderClosedCaptions = () => {
+  _renderClosedCaptions = (waterMarkName, VideoWaterMarkSize) => {
     const containerPadding = 5;
     let captionWidth = this.props.width - (containerPadding * 4);
+    if (waterMarkName) {
+      captionWidth = captionWidth - VideoWaterMarkSize;
+    }
 
     const ccStyle = {
       color: this.props.captionStyles.textColor, fontFamily: this.props.captionStyles.fontName,
-      backgroundColor: 'rgba(0,0,0,'+this.props.config.ccBackgroundOpacity+')'
+      backgroundColor: this.props.captionStyles.textBackgroundColor
     };
     if (this.props.caption) {
       return (
         <View
-          accessible={false}
-          importantForAccessibility="no-hide-descendants"
-          style={[panelStyles.closedCaptionsContainer, {padding: containerPadding, width: captionWidth, backgroundColor: 'transparent', position: "absolute"}]}
+          style={[panelStyles.closedCaptionsContainer, {padding: containerPadding, width: captionWidth}]}
           onTouchEnd={(event) => this.props.handlers.handleVideoTouchEnd(event)}>
-          <Text style={[panelStyles.closedCaptions, ccStyle]}>
-            {this.props.caption}
-          </Text>
+          <View
+            style={[{backgroundColor: this.props.captionStyles.backgroundColor}]}>
+            <Text style={[panelStyles.closedCaptions, ccStyle]}>
+              {this.props.caption}
+            </Text>
+          </View>
         </View>
       );
     }
@@ -262,6 +269,7 @@ class VideoView extends React.Component {
       nextVideo={this.props.nextVideo}
       upNextDismissed={this.props.upNextDismissed}
       onPress={(value) => this.handlePress(value)}
+      platform={this.props.platform}
       width={this.props.width}/>;
   };
 
@@ -300,6 +308,7 @@ class VideoView extends React.Component {
         frameHeight={this.props.height}
         buttonWidth={iconFontSize}
         buttonHeight={iconFontSize}
+        platform={this.props.platform}
         fontSize={iconFontSize}
         showButton={show}
         isLive={this.props.live}
@@ -327,8 +336,7 @@ class VideoView extends React.Component {
   };
 
   _renderAdOverlay = () => {
-    if (this.props.adOverlay == null) {
-
+    if (!this.props.adOverlay) {
       return null;
     }
 
@@ -345,21 +353,19 @@ class VideoView extends React.Component {
     }
     const left = (this.props.width - width) / 2;
 
-    const overlayStyle = {height: height, width: width, backgroundColor: 'transparent'};
-    const positionStyle = {left: left, bottom: 10, width: width, height: height, backgroundColor: 'transparent'};
     return (
       <View
         accesible={false}
-        style={overlayStyle}>
+        style={{height: height, width: width}}>
         <TouchableHighlight
-          style={positionStyle}
+          style={{left: left, bottom: 10, width: width, height: height}}
           onPress={this.handleOverlayClick}>
           <View
             style={styles.container}>
             <Image
-              style={overlayStyle}
+              style={styles.container}
               source={{uri: this.props.adOverlay.resourceUrl}}
-              resizeMode="contain">
+              resizeMode={Image.resizeMode.contain}>
             </Image>
             <TouchableHighlight
               style={panelStyles.dismissOverlay}
@@ -375,7 +381,7 @@ class VideoView extends React.Component {
 
   _renderLoading = () => {
     const loadingSize = ResponsiveDesignManager.makeResponsiveMultiplier(this.props.width, UI_SIZES.LOADING_ICON);
-    const scaleMultiplier = Platform.OS === "android" ? 2 : 1;
+    const scaleMultiplier = this.props.platform === Constants.PLATFORMS.ANDROID ? 2 : 1;
     const topOffset = Math.round((this.props.height - loadingSize * scaleMultiplier) * 0.5);
     const leftOffset = Math.round((this.props.width - loadingSize * scaleMultiplier) * 0.5);
     const loadingStyle = {
@@ -410,7 +416,7 @@ class VideoView extends React.Component {
     return (
       <View
         accessible={false}
-        style={[styles.container, {"height": this.props.height}, {"width": this.props.width}]}>
+        style={styles.container}>
         {this._renderPlaceholder()}
         {this._renderBottom()}
         {this._renderAdOverlay()}

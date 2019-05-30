@@ -9,8 +9,12 @@
  */
 @interface OOClosedCaptionsSelectorViewController : UITableViewController
 
-- (instancetype)initWithViewController:(OOOoyalaPlayerViewController *)controller;
+- (id)initWithViewController:(OOOoyalaPlayerViewController *)c;
 
-- (void)dismiss;
+  /**
+   * Sets the popover that launched this viewcontroller
+   */
+- (void)setPopover:(UIPopoverController *)pop;
+-(void) dismiss;
 
 @end

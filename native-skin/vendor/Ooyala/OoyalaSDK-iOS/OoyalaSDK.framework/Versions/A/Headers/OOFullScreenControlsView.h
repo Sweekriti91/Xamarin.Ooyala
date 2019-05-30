@@ -23,7 +23,6 @@
 @property (nonatomic, weak) id<OOVolumeSliderDelegate> volumeSliderDelegate;
 
 @property (nonatomic) CGRect bottomBarFrame;
-@property (nonatomic) BOOL isPiPActive;
 
 - (void)updateDoneButtonLanguage;
 

@@ -14,7 +14,6 @@
 #import "OOAirPlayButton.h"
 #import "OOClosedCaptionsButton.h"
 #import "OOVolumeSliderView.h"
-#import "OOPiPButton.h"
 
 
 @interface OOFullScreenControlsBottomBarMainControlsView : UIView
@@ -25,11 +24,9 @@
 @property (nonatomic) OONextButton *nextButton;
 @property (nonatomic) OOPreviousButton *previousButton;
 @property (nonatomic) OOAirPlayButton *airPlayButton;
-@property (nonatomic) OOPiPButton *pipButton;
 @property (nonatomic) OOVolumeSliderView *volumeSliderView;
 
 @property (nonatomic) BOOL playingStatus;
 @property (nonatomic) BOOL airPlayButtonShowing;
-@property (nonatomic) BOOL pipButtonShowing;
 
 @end

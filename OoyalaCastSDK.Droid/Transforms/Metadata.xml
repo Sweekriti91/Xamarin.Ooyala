@@ -10,4 +10,7 @@
     <!--<attr path="/api/package[@name='com.ooyala.cast']/interface[@name='OnMessageReceivedListener']"
           name="visibility">public</attr>-->
     <remove-node path="/api/package[@name='com.ooyala.cast']/interface[@name='OnMessageReceivedListener']" />
+    <attr name="visibility" path="/api/package[@name='com.ooyala.cast']/class[@name='CastManager']">public</attr>
+    <attr name="return" path="/api/package[@name='com.ooyala.cast']/class[@name='CastManager']/method[@name='getCastPlayer' and count(parameter)=0]">Com.Ooyala.Android.Player.IPlayerInterface</attr>
+    
 </metadata>

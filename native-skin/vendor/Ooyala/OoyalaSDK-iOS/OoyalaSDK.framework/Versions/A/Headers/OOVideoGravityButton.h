@@ -7,8 +7,6 @@
 
 #import "OOScalableImageButton.h"
 
-#ifndef OOVideoGravityButton_h
-#define OOVideoGravityButton_h
 
 @interface OOVideoGravityButton : OOScalableImageButton
 
@@ -19,5 +17,3 @@
 - (void)setIsGravityFillShowing:(BOOL)isGravityFillShowing;
 
 @end
-
-#endif /* OOVideoGravityButton_h */

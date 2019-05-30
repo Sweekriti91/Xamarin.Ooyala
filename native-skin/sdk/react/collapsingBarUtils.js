@@ -1,46 +1,25 @@
 'use strict';
 
-// MARK: - Constants
-
-const constants = {
-  moreOptions: 'moreOptions',
-  moveToMoreOptions: 'moveToMoreOptions',
-  controlBar: 'controlBar',
-  keep: 'keep'
-};
-
-const CollapsingBarUtils = {
+var CollapsingBarUtils = {
 
   // @param barWidth numeric.
   // @param orderedItems array of left to right ordered items. Each item meets the skin's "button" schema.
   // @return {fit:[items that fit in the barWidth], overflow:[items that did not fit]}.
   // Note: items which do not meet the item spec will be removed and not appear in the results.
-  collapse: function(barWidth, orderedItems) {
-    if (isNaN(barWidth) || barWidth === undefined) {
-      return {fit: orderedItems, overflow: []};
-    }
-    if (!orderedItems) {
-       return [];
-    }
-    const validItems = orderedItems.filter(item => this._isValid(item));
-    const result = this._collapse(barWidth, validItems);
-    return result;
+  collapse: function( barWidth, orderedItems ) {
+    if( isNaN( barWidth ) || barWidth === undefined ) { return { fit : orderedItems, overflow : [] };; }
+    if( ! orderedItems ) { return []; }
+    var self = this;
+    var validItems = orderedItems.filter( function(item) { return self._isValid(item); } );
+    var r = this._collapse( barWidth, validItems );
+    return r;
   },
 
-  collapseForAudioOnly: function(orderedItems) {
-    if (!orderedItems) {
-      return [];
-    }
-    const filteredItems = orderedItems.filter(item => this._isValid(item));
-    const result = {fit: [], overflow: filteredItems};
-    return result;
-  },
-
-  _isValid: function(item) {
-    const valid = (
+  _isValid: function( item ) {
+    var valid = (
       item &&
-      item.location == constants.moreOptions ||
-      (item.location == constants.controlBar &&
+      item.location == "moreOptions" ||
+      (item.location == "controlBar" &&
         item.whenDoesNotFit &&
         item.minWidth !== undefined &&
         item.minWidth >= 0)
@@ -48,55 +27,49 @@ const CollapsingBarUtils = {
     return valid;
   },
 
-  _collapse: function(barWidth, orderedItems) {
-    const result = {fit: orderedItems.slice(), overflow: []};
-    let usedWidth = orderedItems.reduce(function(p, c, i, a) {
-      if (c.minWidth && c.isVisible) return p+c.minWidth;
+  _collapse: function( barWidth, orderedItems ) {
+    var r = { fit : orderedItems.slice(), overflow : [] };
+    var usedWidth = orderedItems.reduce( function(p,c,i,a) {
+      if (c.minWidth) return p+c.minWidth;
       return p;
-    }, 0);
-
-    for (let i = orderedItems.length - 1; i >= 0; --i) {
-      const item = orderedItems[i];
-      if (this._isOnlyInMoreOptions(item)) {
-        usedWidth = this._collapseLastItemMatching(result, item, usedWidth);
+    }, 0 );
+    for( var i = orderedItems.length-1; i >= 0; --i ) {
+      var item = orderedItems[ i ];
+      if( this._isOnlyInMoreOptions(item) ) {
+        usedWidth = this._collapseLastItemMatching(r, item, usedWidth);
+      }
+      if( usedWidth > barWidth && this._isCollapsable(item) ) {
+        usedWidth = this._collapseLastItemMatching(r, item, usedWidth);
       }
     }
-
-    for (let i = orderedItems.length - 1; i >= 0; --i) {
-      const item = orderedItems[i];
-      if (usedWidth > barWidth && this._isCollapsable(item)) {
-        usedWidth = this._collapseLastItemMatching(result, item, usedWidth);
-      }
-    }
-    return result;
+    return r;
   },
 
-  _isOnlyInMoreOptions: function(item) {
-    return item.location == constants.moreOptions;
+  _isOnlyInMoreOptions: function( item ) {
+    var must = item.location == "moreOptions";
+    return must;
   },
 
-  _isCollapsable: function(item) {
-    const collapsable = item.location == constants.controlBar &&
-                        item.whenDoesNotFit &&
-                        item.whenDoesNotFit != constants.keep;
+  _isCollapsable: function( item ) {
+    var collapsable = item.location == "controlBar" && item.whenDoesNotFit && item.whenDoesNotFit != "keep";
     return collapsable;
   },
 
-  _collapseLastItemMatching: function(results, item, usedWidth) {
-    const index = results.fit.lastIndexOf(item);
-    if (index > -1) {
-      results.fit.splice(index, 1);
-      results.overflow.unshift(item);
-      if (item.minWidth) {
+  _collapseLastItemMatching: function( results, item, usedWidth ) {
+    var i = results.fit.lastIndexOf( item );
+    if( i > -1 ) {
+      results.fit.splice( i, 1 );
+      results.overflow.unshift( item );
+      if( item.minWidth ) {
         usedWidth -= item.minWidth;
       }
     }
     return usedWidth;
   },
 
-  _isOverflow: function(item) {
-    return item.whenDoesNotFit && item.whenDoesNotFit == constants.moveToMoreOptions;
+  _isOverflow: function( item ) {
+    return item.whenDoesNotFit && item.whenDoesNotFit == "moveToMoreOptions";
   }
 };
 
-export default CollapsingBarUtils;
+module.exports = CollapsingBarUtils;

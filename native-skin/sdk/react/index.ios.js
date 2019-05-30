@@ -7,25 +7,20 @@ import React, { Component } from 'react';
 import {
   ActivityIndicator,
   AppRegistry,
-  NativeEventEmitter,
-  NativeModules,
+  DeviceEventEmitter,
   StyleSheet,
   AccessibilityInfo
 } from 'react-native';
 
-const {
-   OOReactSkinEventsEmitter,
-   OOReactSkinBridgeModuleMain
- } = NativeModules;
-
-import {
-  CONTENT_TYPES,
+var Constants = require('./constants');
+var {
   SCREEN_TYPES,
+  PLATFORMS,
   DESIRED_STATES
-} from './constants';
-
+} = Constants;
 var OoyalaSkinCore = require('./ooyalaSkinCore');
-const eventBridgeEmitter = new NativeEventEmitter(OOReactSkinEventsEmitter);
+var eventBridge = require('NativeModules').OOReactBridge;
+
 var OoyalaSkinCoreInstance;
 
 class OoyalaSkin extends React.Component {
@@ -56,21 +51,17 @@ class OoyalaSkin extends React.Component {
     // multiAudioEnabled: false,
     // selectedAudioTrack: null,
     // audioTracksTitles: null,
-    // playbackSpeedEnabled: false,
-    // playbackSpeedRates: null,
-    // selectedPlaybackSpeedRate: null
     alertTitle: '',
     alertMessage: '',
     error: null,
     volume: 0,          // between 0 and 1
+    platform:PLATFORMS.IOS,
     screenReaderEnabled: false,
-    contentType: CONTENT_TYPES.VIDEO,
-    onPlayComplete: false
   };
 
   componentWillMount() {
-    OoyalaSkinCoreInstance = new OoyalaSkinCore(this, OOReactSkinBridgeModuleMain);
-    OoyalaSkinCoreInstance.mount(eventBridgeEmitter);
+    OoyalaSkinCoreInstance = new OoyalaSkinCore(this, eventBridge);
+    OoyalaSkinCoreInstance.mount(DeviceEventEmitter);
   }
 
   componentDidMount() {
@@ -117,7 +108,7 @@ class OoyalaSkin extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
+var styles = StyleSheet.create({
   loading: {
     flex: 1,
     alignItems: 'center',

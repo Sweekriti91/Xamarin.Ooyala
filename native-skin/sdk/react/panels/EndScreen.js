@@ -5,14 +5,8 @@ import {
   Text,
   View,
   Image,
-  TouchableHighlight,
-  Platform
+  TouchableHighlight
 } from "react-native";
-
-import {
-  BUTTON_NAMES,
-  UI_SIZES
-} from '../constants';
 
 const Utils = require("../utils");
 const styles = Utils.getStyles(require("./style/endScreenStyles.json"));
@@ -20,6 +14,11 @@ const ResponsiveDesignManager = require('../responsiveDesignManager');
 const InfoPanel = require("../infoPanel");
 const BottomOverlay = require("../bottomOverlay");
 const Log = require("../log");
+const Constants = require("../constants");
+
+const {
+  BUTTON_NAMES
+} = Constants;
 
 class EndScreen extends React.Component {
   static propTypes = {
@@ -37,7 +36,6 @@ class EndScreen extends React.Component {
     handleControlsTouch: PropTypes.func,
     loading: PropTypes.bool,
     onScrub: PropTypes.func,
-    showAudioAndCCButton: PropTypes.bool
   };
 
   state = {
@@ -68,22 +66,18 @@ class EndScreen extends React.Component {
 
   _renderDefaultScreen = (progressBar, controlBar) => {
     const endScreenConfig = this.props.config.endScreen || {};
-
-    const replayMarginBottom = !this.props.config.controlBar.enabled ?
-      ResponsiveDesignManager.makeResponsiveMultiplier(this.props.width, UI_SIZES.CONTROLBAR_HEIGHT) : 1;
-
-    const replayButtonLocation = styles.replayButtonCenter;
-    let replayButton;
+    const replaybuttonLocation = styles.replaybuttonCenter;
+    let replaybutton;
 
     if (endScreenConfig.showReplayButton) {
       const fontFamilyStyle = {fontFamily: this.props.config.icons.replay.fontFamilyName};
-      replayButton = (
-        <TouchableHighlight
+      replaybutton = (
+        <TouchableHighlight 
           accessible={true} accessibilityLabel={BUTTON_NAMES.REPLAY} accessibilityComponentType="button"
-          onPress={(name) => this.handleClick(BUTTON_NAMES.REPLAY)}
+          onPress={(name) => this.handleClick("PlayPause")}
           underlayColor="transparent"
           activeOpacity={0.5}>
-          <Text style={[styles.replayButton, fontFamilyStyle]}>{this.props.config.icons.replay.fontString}</Text>
+          <Text style={[styles.replaybutton, fontFamilyStyle]}>{this.props.config.icons.replay.fontString}</Text>
         </TouchableHighlight>
       );
     }
@@ -93,21 +87,21 @@ class EndScreen extends React.Component {
     const infoPanel = (<InfoPanel title={title} description={description} />);
 
     return (
-      <View style={[styles.fullscreenContainer, {width: this.props.width,height: this.props.height}]}>
+      <View style={styles.fullscreenContainer}>
         <Image
           source={{uri: this.props.promoUrl}}
           style={
             [styles.fullscreenContainer, {
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: this.props.width,
+              position:"absolute",
+              top:0,
+              left:0,
+              width:this.props.width,
               height: this.props.height}]}
-          resizeMode="contain">
+          resizeMode={Image.resizeMode.contain}>
         </Image>
         {infoPanel}
-        <View style={[replayButtonLocation, {marginBottom: replayMarginBottom}]}>
-          {replayButton}
+        <View style={replaybuttonLocation}>
+          {replaybutton}
         </View>
         <View style={styles.controlBarPosition}>
           {this._renderBottomOverlay(true)}
@@ -118,7 +112,6 @@ class EndScreen extends React.Component {
 
   handleScrub = (value) => {
     this.props.onScrub(value);
-    this.handleClick(BUTTON_NAMES.PLAY_PAUSE);
   };
 
   _renderBottomOverlay = (show) => {
@@ -128,6 +121,7 @@ class EndScreen extends React.Component {
       primaryButton={"replay"}
       playhead={this.props.duration}
       duration={this.props.duration}
+      platform={this.props.platform}
       volume={this.props.volume}
       onPress={(name) => this.handlePress(name)}
       shouldShowProgressBar={true}
@@ -137,7 +131,6 @@ class EndScreen extends React.Component {
       fullscreen={this.props.fullscreen}
       isShow={show}
       loading={this.props.loading}
-      showAudioAndCCButton={this.props.showAudioAndCCButton}
       config={{
         controlBar: this.props.config.controlBar,
         buttons: this.props.config.buttons,
@@ -149,7 +142,7 @@ class EndScreen extends React.Component {
 
   _renderLoading ()  {
     const loadingSize = ResponsiveDesignManager.makeResponsiveMultiplier(this.props.width, UI_SIZES.LOADING_ICON);
-    const scaleMultiplier = Platform.OS === 'android' ? 2 : 1;
+    const scaleMultiplier = this.props.platform == Constants.PLATFORMS.ANDROID ? 2 : 1;
     const topOffset = Math.round((this.props.height - loadingSize * scaleMultiplier) * 0.5);
     const leftOffset = Math.round((this.props.width - loadingSize * scaleMultiplier) * 0.5);
     const loadingStyle = {

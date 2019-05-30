@@ -7,9 +7,8 @@ import {
   Text
 } from 'react-native';
 
-import { STRING_CONSTANTS } from '../constants';;
-
 const AccessibilityUtils = require('../accessibilityUtils');
+const Constants = require('../constants');
 const styles = require('../utils').getStyles(require('./style/RectButtonStyles.json'));
 
 class SkipButton extends React.Component {
@@ -36,7 +35,7 @@ class SkipButton extends React.Component {
   }
 
   render() {
-    const accessibilityLabel = AccessibilityUtils.createAccessibilityForForwardButton(this.props.isForward, this.props.timeValue, STRING_CONSTANTS.SECONDS);
+    const accessibilityLabel = AccessibilityUtils.createAccessibilityForForwardButton(this.props.isForward, this.props.timeValue, Constants.STRING_CONSTANTS.SECONDS);
     const position = {
       position: 'absolute'
     };
@@ -46,7 +45,7 @@ class SkipButton extends React.Component {
         accessibilityLabel={accessibilityLabel}
         disabled={this.props.disabled}
         onPress={() => this.onPress()}
-        underlayColor='transparent'
+        underlayColor="transparent"
         importantForAccessibility={'yes'}
         style={[this.props.sizeStyle]}>
         <Animated.View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -57,7 +56,7 @@ class SkipButton extends React.Component {
           </Animated.Text>
           <Animated.Text
             accessible={false}
-            style={[position, {fontSize: this.props.fontStyle.fontSize * 0.5}, this.props.buttonColor, this.props.opacity]}>
+            style={[position, {fontSize: this.props.fontStyle.fontSize * 0.5}, this.props.buttonColor]}>
             {this.props.timeValue}
           </Animated.Text>
         </Animated.View>

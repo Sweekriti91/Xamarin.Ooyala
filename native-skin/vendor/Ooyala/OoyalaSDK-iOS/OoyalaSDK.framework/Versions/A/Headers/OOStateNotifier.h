@@ -7,10 +7,6 @@
 
 #import <Foundation/Foundation.h>
 #import "OOAdPodInfo.h"
-#import "OOPlayerState.h"
-
-#ifndef OOStateNotifier_h
-#define OOStateNotifier_h
 
 @class OOSsaiAdsMetadata;
 
@@ -42,5 +38,3 @@
 - (void)notifySSAIAdPlayed;
 
 @end
-
-#endif /* OOStateNotifier_h */

@@ -5,31 +5,34 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import {
   Animated,
+  Image,
+  ListView,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
   View,
 } from 'react-native';
 
-import {
+var Log = require('../log');
+var Utils = require('../utils');
+var Constants = require('../constants');
+var styles = Utils.getStyles(require('./style/moreOptionScreenStyles.json'));
+var CollapsingBarUtils = require('../collapsingBarUtils');
+
+var {
   BUTTON_NAMES,
-} from '../constants';
+  IMG_URLS,
+} = Constants;
 
-import Log from '../log';
-import CollapsingBarUtils from '../collapsingBarUtils';
-
-const Utils = require('../utils');
-const styles = Utils.getStyles(require('./style/moreOptionScreenStyles.json'));
-
-const dismissButtonSize = 20;
+var dismissButtonSize = 20;
 
 class MoreOptionScreen extends React.Component {
   static propTypes = {
-    height: PropTypes.number,
-    onDismiss: PropTypes.func,
-    onOptionButtonPress: PropTypes.func,
-    config: PropTypes.object,
-    controlBarWidth: PropTypes.number,
-    showAudioAndCCButton: PropTypes.bool,
-    isAudioOnly: PropTypes.bool,
-    selectedPlaybackSpeedRate: PropTypes.string
+  height: PropTypes.number,
+  onDismiss: PropTypes.func,
+  onOptionButtonPress: PropTypes.func,
+  config: PropTypes.object,
+  controlBarWidth: PropTypes.number
   };
 
   state = {
@@ -96,21 +99,14 @@ class MoreOptionScreen extends React.Component {
   };
 
   _renderMoreOptionButtons = (moreOptionButtons) => {
-    let itemCollapsingResults;
+    var itemCollapsingResults = CollapsingBarUtils.collapse( this.props.config.controlBarWidth, this.props.config.buttons );
+    var buttons = itemCollapsingResults.overflow;
+    for(var i = 0; i < buttons.length; i++){
+      var button = buttons[i];
 
-    if (this.props.isAudioOnly) {
-      itemCollapsingResults = CollapsingBarUtils.collapseForAudioOnly(this.props.config.buttons)
-    } else {
-      itemCollapsingResults = CollapsingBarUtils.collapse(this.props.config.controlBarWidth, this.props.config.buttons);
-    }
-
-    const buttons = itemCollapsingResults.overflow;
-    const buttonStyle = [styles.icon, this.props.config.moreOptionsScreen.iconStyle.active];
-
-    for (var i = 0; i < buttons.length; i++) {
-      const button = buttons[i];
-      let buttonIcon = this._renderIcon(button.name);
-      let moreOptionButton;
+      var moreOptionButton;
+      var buttonIcon = this._renderIcon(button.name);
+      var buttonStyle = [styles.icon, this.props.config.moreOptionsScreen.iconStyle.active];
 
       // If a color style exists, we remove it as it is applied to a view, which doesn't support
       // text color modification. Color key only applies to Text views.
@@ -120,47 +116,25 @@ class MoreOptionScreen extends React.Component {
       }
 
       // Skip unsupported buttons to avoid crashes. But log that they were unexpected.
-      if (buttonIcon === undefined || buttonStyle === undefined) {
-        Log.warn('Warning: skipping unsupported More Options button ' + button.name);
+      if (buttonIcon === undefined || buttonStyle === undefined ) {
+        Log.warn( "Warning: skipping unsupported More Options button ", button );
         continue;
       }
 
-      if (button.name === BUTTON_NAMES.STEREOSCOPIC) {
-        if (!this.props.stereoSupported) {
-          continue;
-        }
-      } else if (button.name === BUTTON_NAMES.AUDIO_AND_CC) {
-        Log.warn('showAudioAndCCButton:' + this.props.showAudioAndCCButton);
-        if (!this.props.сlosedCaptionsEnabled && !this.props.multiAudioEnabled && !this.props.showAudioAndCCButton) {
-          continue;
-        }
-      } else if (button.name === BUTTON_NAMES.CLOSED_CAPTIONS) {
-        if (!this.props.сlosedCaptionsEnabled) {
-          continue;
-        }
-      }
-
-      const onOptionPress = function(buttonName, f) {
-        return function() {
+      var onOptionPress = function(buttonName, f){
+        return function(){
           f(buttonName);
         };
-      } (button.name, this.onOptionPress);
+      }(button.name, this.onOptionPress);
 
-      moreOptionButton = Utils.renderRectButton(button.name,
-                                                buttonStyle,
-                                                buttonIcon.fontString,
-                                                onOptionPress,
-                                                this.props.config.moreOptionsScreen.iconSize,
-                                                this.props.config.moreOptionsScreen.color,
-                                                buttonIcon.fontFamilyName,
-                                                i);
+      moreOptionButton = Utils.renderRectButton(button.name, buttonStyle, buttonIcon.fontString, onOptionPress, this.props.config.moreOptionsScreen.iconSize, this.props.config.moreOptionsScreen.color, buttonIcon.fontFamilyName, i);
 
       moreOptionButtons.push(moreOptionButton);
     }
   };
 
   _renderIcon = (buttonName) => {
-    let buttonIcon;
+    var buttonIcon;
     switch(buttonName){
       case BUTTON_NAMES.DISCOVERY:
         buttonIcon = this.props.config.icons.discovery;
@@ -171,27 +145,11 @@ class MoreOptionScreen extends React.Component {
       case BUTTON_NAMES.CLOSED_CAPTIONS:
         buttonIcon = this.props.config.icons.cc;
         break;
-      case BUTTON_NAMES.AUDIO_AND_CC:
-        buttonIcon = this.props.config.icons.audioAndCC;
-        break;
       case BUTTON_NAMES.SHARE:
         buttonIcon = this.props.config.icons.share;
         break;
       case BUTTON_NAMES.SETTING: // TODO: this doesn't exist in the skin.json?
         buttonIcon = this.props.config.icons.setting;
-        break;
-      case BUTTON_NAMES.STEREOSCOPIC:
-        buttonIcon = this.props.config.icons.stereoscopic;
-        break;
-      case BUTTON_NAMES.FULLSCREEN:
-        buttonIcon = this.props.config.icons.expand;
-        break;
-      case BUTTON_NAMES.PLAYBACK_SPEED:
-        const fontStr = this.props.selectedPlaybackSpeedRate;
-        buttonIcon = {
-          fontString: fontStr,
-          fontFamilyName: null
-        };
         break;
       default:
         break;
@@ -200,41 +158,35 @@ class MoreOptionScreen extends React.Component {
   };
 
   render() {
-    let moreOptionButtons = [];
-    this._renderMoreOptionButtons(moreOptionButtons);
-    const dismissButton = Utils.renderRectButton(BUTTON_NAMES.DISMISS,
-                                                 styles.iconDismiss,
-                                                 this.props.config.icons.dismiss.fontString,
-                                                 this.onDismissPress, dismissButtonSize,
-                                                 this.props.config.moreOptionsScreen.color,
-                                                 this.props.config.icons.dismiss.fontFamilyName);
-    const rowAnimationStyle = {transform:[{translateY:this.state.translateY}], opacity: this.state.buttonOpacity};
+  var moreOptionButtons = [];
+  this._renderMoreOptionButtons(moreOptionButtons);
+  var dismissButton = Utils.renderRectButton(BUTTON_NAMES.DISMISS, styles.iconDismiss, this.props.config.icons.dismiss.fontString, this.onDismissPress, dismissButtonSize, this.props.config.moreOptionsScreen.color, this.props.config.icons.dismiss.fontFamilyName);
 
-    const moreOptionRow = (
-      <Animated.View
-        ref='moreOptionRow'
-        style={[styles.rowCenter, rowAnimationStyle]}>
-          {moreOptionButtons}
-      </Animated.View>
-    );
+  var moreOptionRow;
+  var rowAnimationStyle = {transform:[{translateY:this.state.translateY}], opacity: this.state.buttonOpacity};
 
-    const dismissButtonRow = (
-      <View style={styles.dismissButtonTopRight}>
-        {dismissButton}
-      </View>
-    );
-    const animationStyle = {opacity:this.state.opacity};
-    const moreOptionScreen = (
-      <Animated.View style={[styles.fullscreenContainer, animationStyle, {height: this.props.height, width: this.props.width}]}>
-        <Animated.View style={[styles.rowsContainer, animationStyle]}>
-          {moreOptionRow}
-        </Animated.View>
-        {dismissButtonRow}
-      </Animated.View>
-    );
-    return moreOptionScreen;
-  }
+  moreOptionRow = (
+  <Animated.View
+    ref='moreOptionRow'
+    style={[styles.rowCenter, rowAnimationStyle]}>
+    {moreOptionButtons}
+  </Animated.View>);
 
+  var dismissButtonRow = (
+    <View style={styles.dismissButtonTopRight}>
+      {dismissButton}
+    </View>
+  );
+  var animationStyle = {opacity:this.state.opacity};
+  var moreOptionScreen = (
+    <Animated.View style={[styles.fullscreenContainer, animationStyle]}>
+      {moreOptionRow}
+      {dismissButtonRow}
+    </Animated.View>
+  );
+
+  return moreOptionScreen;
+}
 }
 
 module.exports = MoreOptionScreen;

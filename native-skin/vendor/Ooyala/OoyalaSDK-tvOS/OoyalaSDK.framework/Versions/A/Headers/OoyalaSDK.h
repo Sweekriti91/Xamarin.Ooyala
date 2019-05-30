@@ -4,19 +4,6 @@
 
 
 #import "OOOoyalaPlayer.h"
-#import "OOOoyalaPlayerFacade.h"
-#import "OOOoyalaPlayer+AdPluginManagement.h"
-#import "OOOoyalaPlayer+Ads.h"
-#import "OOOoyalaPlayer+Playback.h"
-#import "OOOoyalaPlayer+AppEvents.h"
-#import "OOOoyalaPlayer+PlaybackSpeed.h"
-#import "OOOoyalaPlayer+Cast.h"
-#import "OOOoyalaPlayer+PlaybackWorkflow.h"
-#import "OOOoyalaPlayer+Channel.h"
-#import "OOOoyalaPlayer+ClosedCaptions.h"
-#import "OOOoyalaPlayer+MoviePlayerCreation.h"
-#import "OOOoyalaPlayer+UI.h"
-#import "OOOoyalaPlayer+MultiAudio.h"
 
 #import "OOFCCTVRatingConfiguration.h"
 #import "OOIQConfiguration.h"
@@ -25,7 +12,6 @@
 #import "OOPlayerDomain.h"
 #import "OOPlayerInfo.h"
 #import "OODefaultPlayerInfo.h"
-#import "OODefaultAudioOnlyPlayerInfo.h"
 
 // VAST ad classes
 #import "OOVASTConstants.h"
@@ -70,15 +56,33 @@
 #import "OOControlsViewController.h"
 #import "OOImages.h"
 
-// Audio
-#import "OOAudioSession.h"
-
 #else
 
 // TVOS GVR
 #import "OOOoyalaSimpleTVPlayerViewController.h"
 
 #endif
+
+// Performance Monitoring classes
+#import "OOPerformanceEventWatchMemoryProfiling.h"
+#import "OOPerformanceCPUProfilingStatistics.h"
+#import "OOPerformanceFileSpaceProfilingStatistics.h"
+#import "OOPerformanceMemoryProfilingStatistics.h"
+#import "OOPerformanceEventWatchFileSpaceProfiling.h"
+#import "OOPerformanceEventWatchCPUProfiling.h"
+#import "OOPerformanceMonitor.h"
+#import "OOPerformanceNotificationNameMatcher.h"
+#import "OOPerformanceCountingStatistics.h"
+#import "OOPerformanceStartEndStatistics.h"
+#import "OOPerformanceMonitorBuilder.h"
+#import "OOPerformanceNotificationNameStateMatcher.h"
+#import "OOPerformanceEventMatcherProtocol.h"
+#import "OOPerformanceEventWatchStartEnd.h"
+#import "OOPerformanceStatisticsProtocol.h"
+#import "OOPerformanceEventWatchProtocol.h"
+#import "OOPerformanceStatisticsSnapshot.h"
+#import "OOPerformanceEventWatchCounting.h"
+#import "OOMovingAverage.h"
 
 // Player Interfaces
 #import "OOPlayerProtocol.h"
@@ -128,7 +132,7 @@
 
 #import "OOAssetDownloadOptions.h"
 #import "OOAssetDownloadStream.h"
-#import "OODtoAsset.h"
+#import "OOAssetDownloadManager.h"
 
 #endif
 
@@ -155,12 +159,12 @@
 #import "OOCallbacks.h"
 #import "OOModule.h"
 #import "OOReturnState.h"
+#import "OOUserInfo.h"
 #import "OOStreamPlayerMappingCreator.h"
 #import "OOStreamPlayerMappingPredicate.h"
 #import "OOLifeCycle.h"
 #import "OOManagedAdsPlugin.h"
 #import "OOStateNotifier.h"
-#import "OOPlayerState.h"
 #import "OOAssetLoaderDelegate.h"
 #import "OODeliveryTypeConstants.h"
 

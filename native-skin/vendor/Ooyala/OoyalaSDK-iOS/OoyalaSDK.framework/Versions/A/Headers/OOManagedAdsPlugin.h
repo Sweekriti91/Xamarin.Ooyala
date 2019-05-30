@@ -6,15 +6,10 @@
 //
 
 #import "OOAdSpotPlugin.h"
-
-#ifndef OOManagedAdsPlugin_h
-#define OOManagedAdsPlugin_h
+#import "OOOoyalaPlayer.h"
 
 @interface OOManagedAdsPlugin : OOAdSpotPlugin<OOAdSpotPluginDelegate>
 
-- (instancetype)initWithPlayer:(OOOoyalaPlayer *)p;
 - (void)insertAd:(OOManagedAdSpot *)ad;
 
 @end
-
-#endif /* OOManagedAdsPlugin_h */

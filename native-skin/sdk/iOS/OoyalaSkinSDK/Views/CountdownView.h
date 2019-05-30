@@ -3,11 +3,12 @@
 //  ReactNativeCountdownTimer
 //
 //  Created by Eric Vargas on 11/30/15.
-//  Copyright © 2015 Ooyala. All rights reserved.
+//  Copyright © 2015 Facebook. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 #import <React/RCTComponent.h>
+
 
 @interface CountdownView : UIView
 
@@ -17,9 +18,9 @@
 @property (nonatomic) float time;
 @property (nonatomic) float timeLeft;
 @property (nonatomic) CGFloat radius;
-@property (nonatomic) UIColor *fillColor;
+@property (strong, nonatomic) UIColor *fillColor;
 @property (nonatomic) float fillAlpha;
-@property (nonatomic) UIColor *strokeColor;
+@property (strong, nonatomic) UIColor *strokeColor;
 @property (nonatomic) BOOL automatic;
 
 @end

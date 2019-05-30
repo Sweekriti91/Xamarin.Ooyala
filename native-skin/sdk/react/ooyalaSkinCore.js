@@ -14,25 +14,28 @@ import {
   TouchableHighlight,
 } from "react-native";
 
-import {
+var Log = require("./log");
+var Constants = require("./constants");
+var {
   BUTTON_NAMES,
+  SCREEN_TYPES,
   OVERLAY_TYPES,
+  OOSTATES,
+  PLATFORMS,
   AUTOHIDE_DELAY,
-  MAX_DATE_VALUE
-} from './constants';
+  MAX_DATE_VALUE,
+} = Constants;
+var OoyalaSkinBridgeListener = require("./ooyalaSkinBridgeListener");
+var OoyalaSkinPanelRenderer = require("./ooyalaSkinPanelRenderer");
 
-const Log = require('./log');
-const OoyalaSkinBridgeListener = require('./ooyalaSkinBridgeListener');
-const OoyalaSkinPanelRenderer = require('./ooyalaSkinPanelRenderer');
-
-const clickRadius = 5;
+var clickRadius = 5;
 var startedClickX, startedClickY;
 
 var OoyalaSkinCore = function(ooyalaSkin, eventBridge) {
   this.skin = ooyalaSkin;
   this.bridge = eventBridge;
-  this.ooyalaSkinBridgeListener = new OoyalaSkinBridgeListener(ooyalaSkin, this);
-  this.ooyalaSkinPanelRenderer = new OoyalaSkinPanelRenderer(ooyalaSkin, this);
+  this.ooyalaSkinBridgeListener = new OoyalaSkinBridgeListener(ooyalaSkin, this, eventBridge);
+  this.ooyalaSkinPanelRenderer = new OoyalaSkinPanelRenderer(ooyalaSkin, this, eventBridge);
 };
 
 OoyalaSkinCore.prototype.mount = function(eventEmitter) {
@@ -54,8 +57,8 @@ OoyalaSkinCore.prototype.dismissOverlay = function() {
 }
 
 OoyalaSkinCore.prototype.onBackPressed = function() {
-  let retVal = this.popFromOverlayStackAndMaybeResume();
-  return retVal;
+    var retVal = this.popFromOverlayStackAndMaybeResume();
+    return retVal;
 };
 
 OoyalaSkinCore.prototype.handleLanguageSelection = function(e) {
@@ -68,17 +71,6 @@ OoyalaSkinCore.prototype.handleAudioTrackSelection = function(e) {
   Log.log("onAudioTrackSelected:" + e);
   this.skin.setState({selectedAudioTrack:e});
   this.bridge.onAudioTrackSelected({audioTrack:e});
-};
-
-OoyalaSkinCore.prototype.handlePlaybackSpeedRateSelection = function(e) {
-  Log.log("onPlaybackSpeedRateSelected:" + e);
-  this.skin.setState({selectedPlaybackSpeedRate:e});
-  this.bridge.onPlaybackSpeedRateSelected({playbackSpeedRate:e});
-};
-
-OoyalaSkinCore.prototype.onVolumeChanged = function(volume) {
-  Log.log("onVolumeChanged:" + volume);
-  this.bridge.onVolumeChanged({volume:volume});
 };
 
 // event handlers.
@@ -94,18 +86,7 @@ OoyalaSkinCore.prototype.handleMoreOptionsButtonPress = function(buttonName) {
       break;
     case BUTTON_NAMES.SETTING:
       break;
-    case BUTTON_NAMES.AUDIO_AND_CC:
-      this.pushToOverlayStack(OVERLAY_TYPES.AUDIO_AND_CC_SCREEN);
-      break;
-    case BUTTON_NAMES.PLAYBACK_SPEED:
-      this.pushToOverlayStackAndMaybePause(OVERLAY_TYPES.PLAYBACK_SPEED_SCREEN);
-      break;
-    case BUTTON_NAMES.FULLSCREEN:
-      this.bridge.onPress({name:buttonName});
-      this.dismissOverlay();
-      break;
     default:
-	    this.bridge.onPress({name:buttonName});
       break;
   }
 };
@@ -114,8 +95,8 @@ OoyalaSkinCore.prototype.handleMoreOptionsButtonPress = function(buttonName) {
  *  When a button is pressed on the control bar
  *  If it's a "fast-access" options button, open options menu and perform the options action
  */
-OoyalaSkinCore.prototype.handlePress = function(buttonName) {
-  switch(buttonName) {
+OoyalaSkinCore.prototype.handlePress = function(n) {
+  switch(n) {
     case BUTTON_NAMES.MORE:
       this.pushToOverlayStackAndMaybePause(OVERLAY_TYPES.MOREOPTION_SCREEN);
       break;
@@ -123,10 +104,7 @@ OoyalaSkinCore.prototype.handlePress = function(buttonName) {
       this.pushToOverlayStackAndMaybePause(OVERLAY_TYPES.DISCOVERY_SCREEN);
       break;
     case BUTTON_NAMES.AUDIO_AND_CC:
-      this.pushToOverlayStack(OVERLAY_TYPES.AUDIO_AND_CC_SCREEN);
-      break;
-    case BUTTON_NAMES.PLAYBACK_SPEED:
-      this.pushToOverlayStackAndMaybePause(OVERLAY_TYPES.PLAYBACK_SPEED_SCREEN);
+      this.pushToOverlayStackAndMaybePause(OVERLAY_TYPES.AUDIO_AND_CC_SCREEN);
       break;
     case BUTTON_NAMES.SHARE:
       this.ooyalaSkinPanelRenderer.renderSocialOptions();
@@ -134,15 +112,8 @@ OoyalaSkinCore.prototype.handlePress = function(buttonName) {
     case BUTTON_NAMES.QUALITY:
     case BUTTON_NAMES.SETTING:
       break;
-    case BUTTON_NAMES.VOLUME:
-      this.pushToOverlayStackAndMaybePause(OVERLAY_TYPES.VOLUME_SCREEN);
-      break;
-    case BUTTON_NAMES.MORE_DETAILS:
-      this.pushToOverlayStackAndMaybePause(OVERLAY_TYPES.MORE_DETAILS);
-      break;
     default:
-      Log.log("handlePress button name:",buttonName);
-      this.bridge.onPress({name: buttonName});
+      this.bridge.onPress({name:n});
       break;
   }
 };
@@ -263,14 +234,10 @@ OoyalaSkinCore.prototype.handleControlsTouch = function() {
 
 OoyalaSkinCore.prototype.pushToOverlayStackAndMaybePause = function(overlay) {
   if (this.skin.state.overlayStack.length === 0 && this.skin.state.playing) {
-    Log.log("New stack of overlays, pausing");
+    Log.log("New stack of overlays, pausing")
     this.skin.setState({pausedByOverlay:true});
     this.bridge.onPress({name:BUTTON_NAMES.PLAY_PAUSE});
   }
-  this.pushToOverlayStack(overlay)
-};
-
-OoyalaSkinCore.prototype.pushToOverlayStack = function(overlay) {
   var retVal = this.skin.state.overlayStack.push(overlay);
   this.skin.forceUpdate();
   return retVal;
@@ -295,7 +262,7 @@ OoyalaSkinCore.prototype.popFromOverlayStackAndMaybeResume = function(overlay) {
 OoyalaSkinCore.prototype.renderScreen = function() {
   Log.verbose("Rendering - Current Overlay stack: " + this.skin.state.overlayStack);
   let overlayType = null;
-  if (this.skin.state.overlayStack.length > 0) {
+  if(this.skin.state.overlayStack.length > 0) {
     overlayType = this.skin.state.overlayStack[this.skin.state.overlayStack.length - 1];
     Log.verbose("Rendering Overlaytype: " + overlayType);
   } else {
@@ -307,7 +274,6 @@ OoyalaSkinCore.prototype.renderScreen = function() {
 
 //return boolean -> touch end was in clickRadius from touch start
 let isClick = function(endX, endY) {
-  return Math.sqrt((endX - startedClickX) * (endX - startedClickX) +
-                   (endY - startedClickY) * (endY - startedClickY)) < clickRadius;
+  return Math.sqrt((endX - startedClickX) * (endX - startedClickX) + (endY - startedClickY) * (endY - startedClickY)) < clickRadius;
 };
 module.exports = OoyalaSkinCore;

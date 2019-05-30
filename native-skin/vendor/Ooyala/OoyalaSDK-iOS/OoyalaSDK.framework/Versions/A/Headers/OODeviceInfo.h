@@ -9,11 +9,6 @@
 @property NSString *deviceBrand;
 @property NSString *model;
 
-- (instancetype)initWithBrowser:(NSString *)browser
-                 browserVersion:(NSString *)browserVersion
-                             os:(NSString *)os
-                      osVersion:(NSString *)osVersion
-                    deviceBrand:(NSString *)deviceBrand
-                          model:(NSString *)model;
+- (OODeviceInfo *)initWithBrowser: (NSString*) browser browserVersion: (NSString*) browserVersion os: (NSString*) os osVersion: (NSString*) osVersion deviceBrand: (NSString*) deviceBrand model: (NSString*) model;
 
 @end

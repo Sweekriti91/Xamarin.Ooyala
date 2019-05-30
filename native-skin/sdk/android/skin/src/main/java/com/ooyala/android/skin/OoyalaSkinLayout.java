@@ -1,40 +1,35 @@
 package com.ooyala.android.skin;
 
-
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR1;
 import static android.os.Build.VERSION_CODES.KITKAT;
 
-public class OoyalaSkinLayout extends FrameLayout implements View.OnSystemUiVisibilityChangeListener{
+public class OoyalaSkinLayout extends FrameLayout {
+  private static final String TAG = OoyalaSkinLayout.class.getSimpleName();
   private FrameLayout playerFrame;
 
-  private int viewWidth, viewHeight;
+  private int viewWidth,viewHeight,prevWidth,prevHeight;
+  private int sourceWidth, sourceHeight;
 
   private FrameChangeCallback frameChangeCallback;
 
   private WindowManager windowManager;
   private boolean fullscreen = false;
-  private boolean multiWindowMode = false;
-
-  private int sourceWidth, sourceHeight;
-  private boolean resizableLayout;
 
   public interface FrameChangeCallback {
-    void onFrameChangeCallback(int width, int height, int prevWidth, int prevHeight);
-
-    void onFullscreenToggleCallback();
+      void onFrameChangeCallback(int width, int height,int prevWidth,int prevHeight);
   }
   public void setFrameChangeCallback(FrameChangeCallback fcCallback){
-    this.frameChangeCallback = fcCallback;
+      this.frameChangeCallback = fcCallback;
   }
 
   /**
@@ -53,14 +48,6 @@ public class OoyalaSkinLayout extends FrameLayout implements View.OnSystemUiVisi
    */
   public OoyalaSkinLayout(Context context, AttributeSet attrs) {
     super(context, attrs);
-    TypedArray typedArray = context.getTheme().obtainStyledAttributes(
-            attrs,
-            R.styleable.OoyalaSkinLayout, 0, 0);
-    try {
-      resizableLayout = typedArray.getBoolean(R.styleable.OoyalaSkinLayout_resizableLayout, false);
-    } finally {
-      typedArray.recycle();
-    }
     createSubViews();
   }
 
@@ -82,15 +69,14 @@ public class OoyalaSkinLayout extends FrameLayout implements View.OnSystemUiVisi
   public void createSubViews() {
     if (playerFrame == null) {
       FrameLayout.LayoutParams frameLP =
-              new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        new FrameLayout.LayoutParams(
+          FrameLayout.LayoutParams.MATCH_PARENT,
+          FrameLayout.LayoutParams.MATCH_PARENT);
       playerFrame = new FrameLayout(this.getContext());
       this.addView(playerFrame, frameLP);
 
       this.windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
     }
-
-    final View decorView = ((Activity)getContext()).getWindow().getDecorView();
-    decorView.setOnSystemUiVisibilityChangeListener(this);
   }
 
   /**
@@ -106,24 +92,17 @@ public class OoyalaSkinLayout extends FrameLayout implements View.OnSystemUiVisi
   }
 
   @Override
-  protected void onAttachedToWindow() {
-    super.onAttachedToWindow();
-    ViewGroup.LayoutParams layoutParams = getLayoutParams();
-    sourceWidth = layoutParams.width;
-    sourceHeight = layoutParams.height;
-  }
-
-  @Override
   protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld) {
-    super.onSizeChanged(xNew, yNew, xOld, yOld);
-    viewWidth = xNew;
-    viewHeight = yNew;
-
-    try {
-      this.frameChangeCallback.onFrameChangeCallback(viewWidth, viewHeight, xOld, yOld);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+      super.onSizeChanged(xNew, yNew, xOld, yOld);
+      viewWidth = xNew;
+      viewHeight = yNew;
+      prevWidth = xOld;
+      prevHeight = yOld;
+      try {
+        this.frameChangeCallback.onFrameChangeCallback(viewWidth, viewHeight, prevWidth, prevHeight);
+      } catch (Exception e) {
+          e.printStackTrace();
+      }
   }
 
   public FrameLayout getPlayerLayout() {
@@ -131,48 +110,42 @@ public class OoyalaSkinLayout extends FrameLayout implements View.OnSystemUiVisi
   }
 
   public int getViewWidth() {
-    return viewWidth;
+      return viewWidth;
   }
 
   public int getViewHeight() {
-    return viewHeight;
+      return viewHeight;
   }
 
   public boolean isFullscreen() {
     return this.fullscreen;
   }
 
-  public int getSourceWidth() {
-    return sourceWidth;
-  }
-
-  public int getSourceHeight() {
-    return sourceHeight;
-  }
 
   /**
    * Show/Hide system ui (notification and navigation bar) depending if layout is in fullscreen
    */
   public void toggleSystemUI(boolean fullscreen) {
-    if (fullscreen) {
+    if(fullscreen) {
       if (SDK_INT >= KITKAT) {
         setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION     // hide nav bar
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN          // hide status bar
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);  // toggle system UI visibility automatically
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION     // hide nav bar
+                | View.SYSTEM_UI_FLAG_FULLSCREEN          // hide status bar
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);  // toggle system UI visibility automatically
       } else {
         setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION     // hide nav bar
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN);        // hide status bar
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION     // hide nav bar
+                | View.SYSTEM_UI_FLAG_FULLSCREEN);        // hide status bar
       }
     } else {
-      setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+      setSystemUiVisibility(
+              View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
     }
   }
 
@@ -184,54 +157,47 @@ public class OoyalaSkinLayout extends FrameLayout implements View.OnSystemUiVisi
     // do nothing if window manager isn't set. This is considering an unexpected case, that is
     // why I'm omitting the whole method, since it really depends on windowManager
     if (null == windowManager) {
-      return;
+        return;
     }
-    this.fullscreen = fullscreen;
-    toggleSystemUI(fullscreen);
+    boolean changed = this.fullscreen != fullscreen;
+    ViewGroup.LayoutParams layoutParams = getLayoutParams();
 
-    if (multiWindowMode) {
-      // In multiWindowMode toggleSystemUI not always calls onSizeChanged,
-      // this method was created only to toggle fullscreen button on React.
-      // It helps to show current button state and keeps the states synchronized
-      // on orientation changes.
-      try {
-        this.frameChangeCallback.onFullscreenToggleCallback();
-      } catch (Exception e) {
-        e.printStackTrace();
+
+    if (changed) {
+      if (fullscreen) {
+        //Store the source size of the layout
+        sourceWidth = layoutParams.width;
+        sourceHeight = layoutParams.height;
+      } else {
+        // Restore width and height of the skin layout
+        layoutParams.width = sourceWidth;
+        layoutParams.height = sourceHeight;
       }
     }
-  }
 
-  void setMultiWindowMode(boolean multiWindowMode){
-    this.multiWindowMode = multiWindowMode;
-  }
-
-  private void updateLayoutSize() {
-    ViewGroup.LayoutParams layoutParams = getLayoutParams();
-    if (fullscreen) {
-      //set layout to MATCH_PARENT
-      layoutParams.width = FrameLayout.LayoutParams.MATCH_PARENT;
-      layoutParams.height = FrameLayout.LayoutParams.MATCH_PARENT;
-    } else {
-      // Restore width and height to original values
-      layoutParams.width = sourceWidth;
-      layoutParams.height = sourceHeight;
+    this.fullscreen = fullscreen;
+    if(fullscreen) {
+      DisplayMetrics displayMetrics = new DisplayMetrics();
+      if (SDK_INT >= JELLY_BEAN_MR1) {
+        windowManager.getDefaultDisplay().getRealMetrics(displayMetrics);
+      } else {
+        //TODO: Android 16 and below will show a poor fullscreen experience right now
+        // It will not fill the screen where the navigation bar is supposed to be
+        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+      }
+      layoutParams.width = displayMetrics.widthPixels;
+      layoutParams.height = displayMetrics.heightPixels;
+      bringToFront();
     }
-    requestLayout();
+    toggleSystemUI(fullscreen);
   }
 
   @Override
   protected void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
-    if (!resizableLayout) {
-      updateLayoutSize();
-    }
-  }
 
-  @Override
-  public void onSystemUiVisibilityChange(int i) {
-    if (!resizableLayout) {
-      updateLayoutSize();
-    }
+    // Need to force call this every time there's an orientation change to get the correct
+    // width and height values
+    setFullscreen(this.fullscreen);
   }
 }

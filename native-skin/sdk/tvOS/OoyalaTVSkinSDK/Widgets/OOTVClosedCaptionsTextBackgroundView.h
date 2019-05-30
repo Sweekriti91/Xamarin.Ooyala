@@ -7,10 +7,11 @@
 
 #import <UIKit/UIKit.h>
 
+
 @interface OOTVClosedCaptionsTextBackgroundView : UIView
 
-@property (nonatomic) NSArray *textRects;
-@property (nonatomic) UIColor *highlightColor;
+@property (nonatomic, strong) NSArray* textRects;
+@property (nonatomic, strong) UIColor *highlightColor;
 @property (nonatomic) CGFloat highlightOpacity;
 @property (nonatomic) CGSize shadowOffset;
 @property (nonatomic) CGFloat shadowOpacity;

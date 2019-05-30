@@ -1,6 +1,0 @@
-framework module OoyalaTVSkinSDK {
-  umbrella header "OoyalaTVSkinSDK.h"
-
-  export *
-  module * { export * }
-}

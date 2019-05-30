@@ -23,7 +23,7 @@
  * @param[in] t the ad spot time
  * @returns initialized ad spot
  */
-- (instancetype)initWithTime:(NSNumber *)time;
+- (id)initWithTime:(NSNumber *)t;
 
 /**
  * compare two ad spots based on their time *

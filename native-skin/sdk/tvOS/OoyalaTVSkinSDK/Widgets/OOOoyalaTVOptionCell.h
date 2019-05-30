@@ -6,7 +6,7 @@
 @property UILabel *checkedLabel;
 @property BOOL isFocused;
 
-- (instancetype)initWithFrame:(CGRect)frame;
+- (id)initWithFrame:(CGRect)frame;
 - (BOOL)canBecomeFocused;
 
 @end

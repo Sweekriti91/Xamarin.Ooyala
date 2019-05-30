@@ -282,6 +282,7 @@ namespace OoyalaCastSDK.iOS
 
     // @interface OOCastUtils : NSObject
     [BaseType(typeof(NSObject))]
+    [Protocol]
     interface OOCastUtils
     {
         // +(void)postCastErrorNotificationFrom:(id)from error:(NSError *)error extras:(NSDictionary *)extras;

@@ -11,7 +11,7 @@ import {
   StyleSheet,
   Text,
   View,
-  BackHandler,
+  BackAndroid,
   AccessibilityInfo
 } from 'react-native';
 
@@ -20,11 +20,12 @@ var RCTDeviceEventEmitter = require('RCTDeviceEventEmitter');
 //calling class layout controller
 var eventBridge = require('NativeModules').OoyalaReactBridge;
 
-import {
-  CONTENT_TYPES,
+var Constants = require('./constants');
+var {
   SCREEN_TYPES,
+  PLATFORMS,
   DESIRED_STATES
-} from './constants';
+} = Constants;
 var OoyalaSkinCore = require('./ooyalaSkinCore');
 var OoyalaSkinCoreInstance;
 
@@ -56,15 +57,11 @@ class OoyalaSkin extends React.Component {
     // multiAudioEnabled: false,
     // selectedAudioTrack: null,
     // audioTracksTitles: null,
-    // playbackSpeedEnabled: false,
-    // playbackSpeedRates: null,
-    // selectedPlaybackSpeedRate: null
     alertTitle: '',
     alertMessage: '',
     error: null,
+    platform:PLATFORMS.ANDROID,
     screenReaderEnabled: false,
-    contentType: CONTENT_TYPES.VIDEO,
-    onPlayComplete: false
   };
 
   componentWillMount() {
@@ -74,7 +71,7 @@ class OoyalaSkin extends React.Component {
 
   componentDidMount() {
     // eventBridge.queryState();
-    BackHandler.addEventListener('hardwareBackPress', function () {
+    BackAndroid.addEventListener('hardwareBackPress', function () {
       return OoyalaSkinCoreInstance.onBackPressed();
     });
 
@@ -90,7 +87,6 @@ class OoyalaSkin extends React.Component {
   }
 
   componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress');	
     OoyalaSkinCoreInstance.unmount();
 
     AccessibilityInfo.removeEventListener(
@@ -126,7 +122,7 @@ class OoyalaSkin extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
+var styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',

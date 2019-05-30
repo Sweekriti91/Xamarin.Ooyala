@@ -17,7 +17,7 @@
 /**
 * @return non-nil (possibly empty) NSNumber (int in seconds) set of cue point times for ads.
 */
-- (NSSet *)getCuePointsAtSeconds;
+- (NSSet*)getCuePointsAtSeconds;
 
 /**
  * Mark all adspots as unplayed
@@ -70,39 +70,4 @@
  */
 - (NSUInteger)count;
 
-/**
- * Get first ad in ad array
- *
- * @returns OOAdSpot
- */
-- (OOAdSpot *)firstAd;
-
-/**
- * Get next ad to be played
- *
- * @returns OOAdSpot
- */
-- (OOAdSpot *)nextAd;
-
-/**
- * Get last ad in ad array
- *
- * @returns OOAdSpot
- */
-- (OOAdSpot *)lastAd;
-
-/**
- * Returns YES if all ads were already played
- *
- * @returns YES or NO
- */
-- (BOOL)allAdsPlayed;
-
-/**
- * Returns YES if ad was already played
- *
- * @returns YES or NO
- */
-- (BOOL)adPlayed:(OOAdSpot *)ad;
-  
 @end

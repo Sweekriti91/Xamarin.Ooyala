@@ -6,7 +6,6 @@ import org.json.JSONObject;
 
 public class SkinOptions {
   private static final String TAG = SkinOptions.class.getSimpleName();
-  private static final String DEFAULT_BUNDLE_NAME = "index.android.jsbundle";
 
   // Skin Options variables
   private final String bundleAssetName;
@@ -31,7 +30,7 @@ public class SkinOptions {
      * bundleAssetName = index.android.jsbundle;
      */
     public Builder() {
-      this.bundleAssetName = DEFAULT_BUNDLE_NAME;
+      this.bundleAssetName = "index.android.jsbundle";
       this.skinOverrides = new JSONObject();
       this.enableReactJSServer = false;
       this.reactJSServerHost = "127.0.0.1:8081";
@@ -132,9 +131,6 @@ public class SkinOptions {
    * @return bundleAssetName
    */
   public String getBundleAssetName() {
-    if (bundleAssetName == null) {
-      return DEFAULT_BUNDLE_NAME;
-    }
     return bundleAssetName;
   }
 

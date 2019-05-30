@@ -2,7 +2,7 @@
 //  OOOoyalaTVBar.m
 //  OoyalaTVSkinSDK
 //
-//  Created on 7/20/16.
+//  Created by Yi Gu on 7/20/16.
 //  Copyright © 2016 ooyala. All rights reserved.
 //
 
@@ -11,11 +11,14 @@
 
 @implementation OOOoyalaTVBar
 
-- (instancetype)initWithFrame:(CGRect)frame color:(UIColor *)color{
-  if (self = [super initWithFrame:frame]) {
+- (id)initWithFrame:(CGRect)frame color:(UIColor *)color{
+  self = [super initWithFrame:frame];
+  
+  if (self) {
     self.backgroundColor = color;
     self.layer.cornerRadius = barCornerRadius;
   }
+  
   return self;
 }
 

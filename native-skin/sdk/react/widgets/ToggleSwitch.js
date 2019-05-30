@@ -15,6 +15,8 @@ import {
   View,
 } from 'react-native';
 
+var Constants = require('../constants');
+
 var styles = require('../utils').getStyles(require('./style/ToggleSwitchStyles.json'));
 
 // Tint props only work for iOS.

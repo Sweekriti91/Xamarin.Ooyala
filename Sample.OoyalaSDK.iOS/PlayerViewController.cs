@@ -7,18 +7,23 @@ using Foundation;
 using System.Collections.Generic;
 using ObjCRuntime;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Sample.OoyalaSDK.iOS
 {
-    public class PlayerViewController : UIViewController, IOOCastMiniControllerDelegate, IOOCastManagerDelegate, IOOAssetDownloadManagerDelegate
+    public class PlayerViewController : UIViewController, IOOCastMiniControllerDelegate, IOOCastManagerDelegate//, IOOAssetDownloadManagerDelegate
     {
-        private const string _embedCode = "Y1ZHB1ZDqfhCPjYYRbCEOz0GR8IsVRm1";
+        private const string _embedCode = "JiOTdrdzqAujYa5qvnOxszbrTEuU5HMt";
 
         UIButton _startButton;
+        UILabel _downloadProgressLabel;
 
+        OODtoAsset _videoAsset;
         OOOoyalaPlayerViewController _castVC;
         OOCastMiniControllerView _castController;
         OOCastManager castManager;
+        NSUrl _cacheLocation;
 
         public override void LoadView()
         {
@@ -26,10 +31,18 @@ namespace Sample.OoyalaSDK.iOS
 
             View.BackgroundColor = UIColor.White;
 
+            _downloadProgressLabel = new UILabel()
+            {
+                Text = "Download state",
+                TextColor = UIColor.Magenta,
+                TextAlignment = UITextAlignment.Center,
+            };
+            View.AddSubview(_downloadProgressLabel);
+
             _startButton = new UIButton(UIButtonType.System);
             _startButton.SetTitle("Click me", UIControlState.Normal);
             View.AddSubview(_startButton);
-
+          
             castManager = OOCastManager.CastManagerWithAppID("4172C76F", "urn:x-cast:ooyala");
             castManager.WeakDelegate = this;
 
@@ -37,11 +50,11 @@ namespace Sample.OoyalaSDK.iOS
             options.Pcode = "c0cTkxOqALQviQIGAHWY5hP0q9gU";
             options.EmbedCode = _embedCode;
             options.Domain = new OOPlayerDomain("http://www.ooyala.com");
-            //options.EmbedTokenGenerator = new TokenGenerator();
-            var manager = new OOAssetDownloadManager(options);
-            manager.WeakDelegate = this;
-            manager.StartDownload();
-
+            _videoAsset = new OODtoAsset(options, "Clear HLS Video");
+            _videoAsset.DownloadWithProgressClosure(HandleProgressParameter);
+            _videoAsset.FinishWithRelativePath(HandleFinishParameter);
+            _videoAsset.OnErrorWithErrorClosure(HandleErrorParameter);
+            _downloadProgressLabel.Text = _videoAsset.StateText;
             var castPlayer = new OOOoyalaPlayer(
                 pcode: "c0cTkxOqALQviQIGAHWY5hP0q9gU",
                 domain: new OOPlayerDomain("http://www.ooyala.com"));
@@ -52,6 +65,30 @@ namespace Sample.OoyalaSDK.iOS
 
             _castVC = new OOOoyalaPlayerViewController(player: castPlayer);
         }
+
+        void HandleErrorParameter(OOOoyalaError arg0)
+        {
+            Debug.WriteLine($"ERROR: {arg0}");
+            _downloadProgressLabel.Text = arg0.Message;
+        }
+
+
+        void HandleProgressParameter(double arg0)
+        {
+            Debug.WriteLine($"PERCENT COMPLETE: {(arg0 * 100)} %");
+            _downloadProgressLabel.Text = $"PERCENT COMPLETE: {(arg0 * 100)} %";
+        }
+
+
+        void HandleFinishParameter(string arg0)
+        {
+            Debug.WriteLine($"Completed!: {arg0}");
+            _downloadProgressLabel.Text = $"Completed!: {arg0}";
+            NSString urlString = new NSString(arg0);
+            NSUrl myFileUrl = new NSUrl(urlString);
+            _cacheLocation = myFileUrl;
+        }
+
 
         public override void ViewDidAppear(bool animated)
         {
@@ -124,10 +161,20 @@ namespace Sample.OoyalaSDK.iOS
                 bounds.Width - 40,
                 40
             );
+
+            _downloadProgressLabel.Frame = new CGRect(
+                20,
+                bounds.GetMidY() - 50,
+                bounds.Width - 40,
+                40
+            );
         }
 
         void _startButton_TouchUpInside(object sender, System.EventArgs e)
         {
+            Debug.WriteLine("Download state :: ", _videoAsset.StateText);
+            Debug.WriteLine("Current Download :: ", _videoAsset.CurrentDownload);
+            _cacheLocation = _videoAsset.LocalUrl;
             var video = new OOOfflineVideo(_cacheLocation);
             _castVC.Player.SetUnbundledVideo(video);
 
@@ -153,29 +200,5 @@ namespace Sample.OoyalaSDK.iOS
             miniControllerView.Dismiss();
             castManager.DisconnectFromOoyalaPlayer();
         }
-
-        public void DownloadTaskStartedWithError(OOAssetDownloadManager manager, OOOoyalaError error)
-        {
-            System.Diagnostics.Debug.WriteLine($"ERROR: {error}");
-        }
-
-        public void DownloadCompletedAtLocation(OOAssetDownloadManager manager, NSUrl location, OOOoyalaError error)
-        {
-            System.Diagnostics.Debug.WriteLine($"Completed!: {location}");
-            _cacheLocation = location;
-        }
-
-        public void DownloadPercentage(OOAssetDownloadManager manager, double percentage)
-        {
-            System.Diagnostics.Debug.WriteLine($"PERCENT COMPLETE: {percentage}");
-        }
-
-        public void PersistedContentKeyAtLocation(OOAssetDownloadManager manager, NSUrl location)
-        {
-            System.Diagnostics.Debug.WriteLine($"Persisted at: {location}");
-            _cacheLocation = location;
-        }
-
-        NSUrl _cacheLocation;
     }
 }

@@ -8,13 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import "OOOoyalaPlayerViewController.h"
-#import "OOPlayerState.h"
-#import "OOEnums.h"
 
 @class OOOoyalaPlayer;
 
 static const double CONTROLS_HIDE_TIMEOUT = 5.37;
-
 @interface OOControlsViewController : UIViewController
 
 @property (nonatomic, weak) id delegate;
@@ -22,29 +19,27 @@ static const double CONTROLS_HIDE_TIMEOUT = 5.37;
 @property (nonatomic, weak) UIView *overlay;
 @property (nonatomic) UIActivityIndicatorView *activityView;
 @property (nonatomic) UIView *controls;
-@property (nonatomic) BOOL isVisible;
+@property (nonatomic) bool isVisible;
 @property (nonatomic) NSTimer *hideControlsTimer;
 @property (nonatomic) BOOL autohideControls;
 
-- (instancetype)initWithControlsType:(OOOoyalaPlayerControlType)controlsType
-                              player:(OOOoyalaPlayer *)player
-                             overlay:(UIView *)overlay
-                            delegate:(id)theDelegate;
+- (id) initWithControlsType:(OOOoyalaPlayerControlType)controlsType player:(OOOoyalaPlayer *)player  overlay:(UIView *) overlay delegate:(id)delegate;
 
 - (void)showControls;
 - (void)hideControls;
-- (void)syncUIWithState:(OOOoyalaPlayerState)state;
+- (void)syncUI;
+
 
 //Hide and show the full screen button on the inline view
-- (void)setFullScreenButtonShowing:(BOOL)isShowing;
+- (void)setFullScreenButtonShowing: (BOOL) isShowing;
 
 //Hide and show the volume button on the inline view
-- (void)setVolumeButtonShowing:(BOOL)isShowing;
+- (void)setVolumeButtonShowing: (BOOL) isShowing;
 
-- (OOUIProgressSliderMode)sliderMode;
+- (OOUIProgressSliderMode) sliderMode;
 
 // Change the language of controls when close caption changed
-- (void)changeButtonLanguage:(NSString *)language;
+- (void)changeButtonLanguage:(NSString*)language;
 
 // Switch the gravity for full screen mode.
 - (void)switchVideoGravity;

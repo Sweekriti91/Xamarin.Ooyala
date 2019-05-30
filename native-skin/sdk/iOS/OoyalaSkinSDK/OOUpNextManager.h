@@ -4,9 +4,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <OoyalaSDK/OOOoyalaPlayer.h>
 
-@class OOReactSkinModel;
-@class OOOoyalaPlayer;
+@class OOReactBridge;
 
 @interface OOUpNextManager : NSObject
 
@@ -14,10 +14,10 @@
 @property (nonatomic, readonly, weak) OOOoyalaPlayer *player;
 
 - (instancetype)initWithPlayer:(OOOoyalaPlayer *)player
-              ooReactSkinModel:(OOReactSkinModel *)ooReactSkinModel
+                        bridge:(OOReactBridge *)bridge
                         config:(NSDictionary *)config;
 
-- (void)setNextVideo:(NSDictionary *)nextVideo;
+- (void)setNextVideo:(NSMutableArray *)nextVideo;
 
 - (void)playCompletedNotification:(NSNotification *)notification;
 - (void)currentItemChangedNotification:(NSNotification *)notification;

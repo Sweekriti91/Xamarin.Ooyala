@@ -7,11 +7,7 @@
 
 #import "OOScalableImageButton.h"
 
-#ifndef OOVolumeButton_h
-#define OOVolumeButton_h
 
 @interface OOVolumeButton : OOScalableImageButton
 
 @end
-
-#endif /* OOVolumeButton */

@@ -6,11 +6,11 @@
 //  Copyright (c) 2015 ooyala. All rights reserved.
 //
 
+#import <Foundation/Foundation.h>
 #import <OoyalaSDK/OOClosedCaptionsStyle.h>
-
-@class OOClosedCaptionsView;
+#import <OoyalaSDK/OOClosedCaptionsView.h>
 
 @interface OOSkinAutoUpdatingClosedCaptionsStyle : OOClosedCaptionsStyle
-- (instancetype)initWithClosedCaptionsView:(OOClosedCaptionsView*)ccView;
+-(id) initWithClosedCaptionsView:(OOClosedCaptionsView*)ccView;
 @end
 

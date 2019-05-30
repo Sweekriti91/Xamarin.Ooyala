@@ -13,7 +13,6 @@
 #import "OOAirPlayButton.h"
 #import "OOClosedCaptionsButton.h"
 #import "OOProgressSliderView.h"
-#import "OOPiPButton.h"
 
 
 @interface OOInlineControlsBottomBar : UIView
@@ -25,13 +24,11 @@
 @property (nonatomic) OOAirPlayButton *airPlayButton;
 @property (nonatomic) OOClosedCaptionsButton *closedCaptionsButton;
 @property (nonatomic) OOProgressSliderView *timeSlider;
-@property (nonatomic) OOPiPButton *pipButton;
 
 @property (nonatomic) BOOL isPlayingStatus;
 @property (nonatomic) BOOL fullscreenButtonShowing;
 @property (nonatomic) BOOL airPlayButtonShowing;
 @property (nonatomic) BOOL gravityFillButtonShowing;
 @property (nonatomic) BOOL closedCaptionsButtonShowing;
-@property (nonatomic) BOOL pipButtonShowing;
 
 @end
